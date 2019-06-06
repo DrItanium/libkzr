@@ -95,4 +95,25 @@ encode(std::ostream& out, uint64_t value) {
     return out;
 }
 
+std::istream& 
+decode(std::istream& in, std::string& data) {
+    uint16_t len;
+    decode(in, len);
+    data.reserve(len);
+    return in.read(data.data(), len);
+}
+std::ostream& 
+encode(std::ostream& out, const std::string& value) {
+    if (uint16_t len = value.length(); len != value.length()) {
+        /// @todo use an actual exception here
+        throw "String too long!";
+    } else {
+        encode(out, len);
+        for (const auto& c : value) {
+            encode(out, uint8_t(c));
+        }
+        return out;
+    }
+}
+
 } // end namespace kzr
