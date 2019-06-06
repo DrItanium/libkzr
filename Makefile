@@ -5,7 +5,7 @@ COPYRIGHT = ©2019 Joshua Scoggins
 CXXFLAGS += '-DVERSION="$(VERSION)"' \
 			'-DCOPYRIGHT="$(COPYRIGHT)"'
 
-LIBKZR_CORE_OBJS := message.o
+LIBKZR_CORE_OBJS := Message.o
 
 LIBKZR_ARCHIVE := libkzr.a
 
