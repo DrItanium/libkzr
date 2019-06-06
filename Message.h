@@ -71,6 +71,11 @@ std::istream& decode(std::istream&, uint64_t&);
 std::ostream& encode(std::ostream&, uint64_t);
 std::istream& decode(std::istream&, std::string&);
 std::ostream& encode(std::ostream&, const std::string&);
+std::istream& decode(std::istream&, std::list<std::string>&);
+std::ostream& encode(std::ostream&, const std::list<std::string>&);
+std::istream& decode(std::istream&, std::vector<std::string>&);
+std::ostream& encode(std::ostream&, const std::vector<std::string>&);
+
 
 template<typename T, size_t capacity>
 std::istream& decode(std::istream& in, std::array<T, capacity>& collection) {

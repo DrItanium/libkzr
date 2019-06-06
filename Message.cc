@@ -116,4 +116,53 @@ encode(std::ostream& out, const std::string& value) {
     }
 }
 
+std::istream& 
+decode(std::istream& in, std::list<std::string>& collec) {
+    uint16_t len;
+    decode(in, len); // we can discard this value as it doesn't matter
+    for (auto i = 0; i < len; ++i) {
+        std::string temporary;
+        decode(in, temporary);
+        collec.emplace_back(temporary);
+    }
+    return in;
+}
+std::ostream&
+encode(std::ostream& out, const std::list<std::string>& collec) {
+    if (uint16_t len = collec.size(); len != collec.size()) {
+        /// @todo use an actual exception here
+        throw "String too long!";
+    } else {
+        encode(out, len);
+        for (const auto& c : collec) {
+            encode(out, c);
+        }
+        return out;
+    }
+}
+std::istream& 
+decode(std::istream& in, std::vector<std::string>& collec) {
+    uint16_t len;
+    decode(in, len); // we can discard this value as it doesn't matter
+    for (auto i = 0; i < len; ++i) {
+        std::string temporary;
+        decode(in, temporary);
+        collec.emplace_back(temporary);
+    }
+    return in;
+}
+std::ostream&
+encode(std::ostream& out, const std::vector<std::string>& collec) {
+    if (uint16_t len = collec.size(); len != collec.size()) {
+        /// @todo use an actual exception here
+        throw "String too long!";
+    } else {
+        encode(out, len);
+        for (const auto& c : collec) {
+            encode(out, c);
+        }
+        return out;
+    }
+}
+
 } // end namespace kzr
