@@ -32,6 +32,8 @@
 #include <ostream>
 #include <string>
 #include <array>
+#include <list>
+#include <vector>
 
 namespace kzr {
 /**
@@ -83,6 +85,38 @@ std::ostream& encode(std::ostream& out, const std::array<T, capacity>& collectio
     }
     return out;
 }
+template<typename T>
+std::istream& decode(std::istream& in, std::vector<T>& collection) {
+    for (auto& ptr : collection) {
+        decode(in, ptr);
+    }
+    return in;
+}
+
+template<typename T>
+std::istream& decode(std::istream& in, std::list<T>& collection) {
+    for (auto& ptr : collection) {
+        decode(in, ptr);
+    }
+    return in;
+}
+
+template<typename T>
+std::ostream& encode(std::ostream& out, const std::vector<T>& collection) {
+    for (const auto& ptr : collection) {
+        encode(out, ptr);
+    }
+    return out;
+}
+
+template<typename T>
+std::ostream& encode(std::ostream& out, const std::list<T>& collection) {
+    for (const auto& ptr : collection) {
+        encode(out, ptr);
+    }
+    return out;
+}
+
 } // end namespace kzr
 #endif // end KZR_MESSAGE_H__
 
