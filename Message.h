@@ -36,11 +36,6 @@
 #include <vector>
 
 namespace kzr {
-class Messageable {
-    public:
-        virtual void encode(std::ostream&) const = 0;
-        virtual void decode(std::istream&) = 0;
-};
 /**
  * Generic version of decoding messages, it assumes the class/struct has a
  * decode method.
@@ -80,7 +75,6 @@ std::istream& decode(std::istream&, std::list<std::string>&);
 std::ostream& encode(std::ostream&, const std::list<std::string>&);
 std::istream& decode(std::istream&, std::vector<std::string>&);
 std::ostream& encode(std::ostream&, const std::vector<std::string>&);
-
 
 template<typename T, size_t capacity>
 std::istream& decode(std::istream& in, std::array<T, capacity>& collection) {
