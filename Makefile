@@ -41,3 +41,4 @@ clean:
 # generated via g++ -MM -std=c++17 *.cc
 
 
+Message.o: Message.cc Message.h
