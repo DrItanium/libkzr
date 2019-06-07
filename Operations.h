@@ -28,6 +28,8 @@
 #ifndef KZR_OPERATIONS_H__
 #define KZR_OPERATIONS_H__
 #include <cstdint>
+#include <istream>
+#include <ostream>
 namespace kzr {
     enum class Operation : uint8_t {
 #define X(kind, value) \
@@ -129,5 +131,7 @@ namespace kzr {
             }
         }
     }
+    std::ostream& encode(std::ostream&, Operation);
+    std::istream& decode(std::istream&, Operation&);
 } // end namespce kzr
 #endif // end KZR_OPERATIONS_H__

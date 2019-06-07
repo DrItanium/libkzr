@@ -164,5 +164,17 @@ encode(std::ostream& out, const std::vector<std::string>& collec) {
         return out;
     }
 }
+Message::Message(Operation op, uint16_t tag) : _op(op), _tag(tag) { }
+Message::Message(Operation op) : Message(op, -1) { }
+void 
+Message::encode(std::ostream& out) const {
+    kzr::encode(out, _op);
+    kzr::encode(out, _tag);
+}
+void 
+Message::decode(std::istream& in) {
+    kzr::decode(in, _op);
+    kzr::decode(in, _tag);
+}
 
 } // end namespace kzr

@@ -123,22 +123,43 @@ std::ostream& encode(std::ostream& out, const std::list<T>& collection) {
     return out;
 }
 
+
 /**
- * Holds the arguments of a request by the client or a response by the server.
+ * Holds the arguments of a request by the client or a response by the server;
+ * This top level class contains the elements common to all message kinds
  */
 class Message {
     public:
-        Message(Operation op, uint16_t tag = -1);
+        Message() = default;
+        Message(Operation op, uint16_t tag);
         explicit Message(Operation op);
+        virtual ~Message() = default;
         constexpr auto getOperation() const noexcept { return _op; }
         constexpr auto getTag() const noexcept { return _tag; }
         void setTag(uint16_t value) noexcept { _tag = value; }
         void setOperation(Operation value) noexcept { _op = value; }
+        virtual void encode(std::ostream&) const;
+        virtual void decode(std::istream&);
     private:
         Operation _op;
         uint16_t _tag;
-        
+};
 
+class VersionMessage : public Message {
+    public:
+        using Parent = Message;
+    public:
+        using Parent::Parent;
+        virtual ~VersionMessage() = default;
+        void encode(std::ostream&) const override;
+        void decode(std::istream&) override;
+        auto getVersion() const noexcept { return _version; }
+        constexpr auto getMsize() const noexcept { return _msize; }
+        void setMsize(uint16_t msize) noexcept { _msize = msize; }
+        void setVersion(const std::string& value) { _version = value; }
+    private:
+        std::string _version;
+        uint16_t _msize;
 };
 
 } // end namespace kzr

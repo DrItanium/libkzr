@@ -5,7 +5,8 @@ COPYRIGHT = ©2019 Joshua Scoggins
 CXXFLAGS += '-DVERSION="$(VERSION)"' \
 			'-DCOPYRIGHT="$(COPYRIGHT)"'
 
-LIBKZR_CORE_OBJS := Message.o
+LIBKZR_CORE_OBJS := Message.o \
+	Operations.o
 
 LIBKZR_ARCHIVE := libkzr.a
 
@@ -41,4 +42,5 @@ clean:
 # generated via g++ -MM -std=c++17 *.cc
 
 
-Message.o: Message.cc Message.h
+Message.o: Message.cc Message.h Operations.h
+Operations.o: Operations.cc Operations.h Message.h
