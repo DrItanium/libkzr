@@ -27,6 +27,7 @@
  */
 
 #include "Message.h"
+#include "Exception.h"
 
 namespace kzr {
 
@@ -105,8 +106,7 @@ decode(std::istream& in, std::string& data) {
 std::ostream& 
 encode(std::ostream& out, const std::string& value) {
     if (uint16_t len = value.length(); len != value.length()) {
-        /// @todo use an actual exception here
-        throw "String too long!";
+        throw kzr::Exception("Attempted to encode a string of ", value.length(), " characters when ", ((decltype(len))-1), " is the maximum allowed!");
     } else {
         encode(out, len);
         for (const auto& c : value) {
@@ -130,8 +130,7 @@ decode(std::istream& in, std::list<std::string>& collec) {
 std::ostream&
 encode(std::ostream& out, const std::list<std::string>& collec) {
     if (uint16_t len = collec.size(); len != collec.size()) {
-        /// @todo use an actual exception here
-        throw "String too long!";
+        throw kzr::Exception("Attempted to encode a std::list<std::string> of ", collec.size(), " elements when ", ((decltype(len))-1), " is the maximum allowed!");
     } else {
         encode(out, len);
         for (const auto& c : collec) {
@@ -154,8 +153,7 @@ decode(std::istream& in, std::vector<std::string>& collec) {
 std::ostream&
 encode(std::ostream& out, const std::vector<std::string>& collec) {
     if (uint16_t len = collec.size(); len != collec.size()) {
-        /// @todo use an actual exception here
-        throw "String too long!";
+        throw kzr::Exception("Attempted to encode a std::vector<std::string> of ", collec.size(), " elements when ", ((decltype(len))-1), " is the maximum allowed!");
     } else {
         encode(out, len);
         for (const auto& c : collec) {
