@@ -103,5 +103,31 @@ namespace kzr {
                 return false;
         }
     }
+    constexpr auto expectedOperationKind(Operation op) noexcept {
+        if (isRMessage(op)) {
+            return Operation::RError;
+        } else {
+            // must be a transmit message
+            switch (op) {
+#define X(kind) case Operation:: T ## kind : return Operation:: R ## kind
+                X(Version);
+                X(Auth);
+                X(Attach);
+                X(Error);
+                X(Flush);
+                X(Walk);
+                X(Open);
+                X(Create);
+                X(Read);
+                X(Write);
+                X(Clunk);
+                X(Remove);
+                X(Stat);
+                X(WStat);
+#undef X
+                default: return Operation::RError;
+            }
+        }
+    }
 } // end namespce kzr
 #endif // end KZR_OPERATIONS_H__
