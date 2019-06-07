@@ -51,7 +51,7 @@ namespace kzr {
     };
     template<typename T>
     constexpr auto isEven(T value) noexcept {
-        return (op & 1) == 0;
+        return (value & 1) == 0;
     }
     template<typename T>
     constexpr auto isOdd(T value) noexcept {

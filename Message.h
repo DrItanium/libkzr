@@ -34,6 +34,7 @@
 #include <array>
 #include <list>
 #include <vector>
+#include "Operations.h"
 
 namespace kzr {
 /**
@@ -121,6 +122,24 @@ std::ostream& encode(std::ostream& out, const std::list<T>& collection) {
     }
     return out;
 }
+
+/**
+ * Holds the arguments of a request by the client or a response by the server.
+ */
+class Message {
+    public:
+        Message(Operation op, uint16_t tag = -1);
+        explicit Message(Operation op);
+        constexpr auto getOperation() const noexcept { return _op; }
+        constexpr auto getTag() const noexcept { return _tag; }
+        void setTag(uint16_t value) noexcept { _tag = value; }
+        void setOperation(Operation value) noexcept { _op = value; }
+    private:
+        Operation _op;
+        uint16_t _tag;
+        
+
+};
 
 } // end namespace kzr
 #endif // end KZR_MESSAGE_H__
