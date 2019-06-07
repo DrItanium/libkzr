@@ -6,7 +6,8 @@ CXXFLAGS += '-DVERSION="$(VERSION)"' \
 			'-DCOPYRIGHT="$(COPYRIGHT)"'
 
 LIBKZR_CORE_OBJS := Message.o \
-	Operations.o
+	Operations.o \
+	Exception.o
 
 LIBKZR_ARCHIVE := libkzr.a
 
@@ -42,5 +43,6 @@ clean:
 # generated via g++ -MM -std=c++17 *.cc
 
 
+Exception.o: Exception.cc Exception.h
 Message.o: Message.cc Message.h Operations.h
 Operations.o: Operations.cc Operations.h Message.h
