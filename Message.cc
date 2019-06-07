@@ -177,4 +177,18 @@ Message::decode(std::istream& in) {
     kzr::decode(in, _tag);
 }
 
+void
+VersionMessage::encode(std::ostream& out) const {
+    Parent::encode(out);
+    kzr::encode(out, _msize);
+    kzr::encode(out, _version);
+}
+
+void
+VersionMessage::decode(std::istream& in) {
+    Parent::decode(in);
+    kzr::decode(in, _msize);
+    kzr::decode(in, _version);
+}
+
 } // end namespace kzr
