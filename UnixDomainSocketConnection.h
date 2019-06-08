@@ -25,39 +25,24 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include <sys/types.h>
-#include <sys/socket.h>
+
+#ifndef KZR_UNIX_DOMAIN_SOCKET_CONNECTION_H__
+#define KZR_UNIX_DOMAIN_SOCKET_CONNECTION_H__
+#include <string>
 #include "SocketConnection.h"
-#include "Exception.h"
 namespace kzr {
-SocketConnection::SocketConnection(SocketDomain dom, SocketType typ, int protocol) : Parent(socket(int(dom), int(typ), protocol), true), _domain(dom), _type(typ), _protocol(protocol), _mode(SocketMode::Undefined)  { }
+class UnixDomainSocketConnection : public SocketConnection {
+    public:
+        using Parent = SocketConnection;
+    public:
+        UnixDomainSocketConnection(const std::string& address);
+        virtual ~UnixDomainSocketConnection();
+        std::string getAddress() const noexcept { return _address; }
+    private:
+        std::string _address;
 
-SocketConnection::~SocketConnection() { }
+};
 
-void
-SocketConnection::dial(const std::string& addr) {
-    if (_mode != SocketMode::Undefined) {
-        throw Exception("SocketConnection's mode is already set");
-    } else {
-        if (!isValidHandle()) {
-            throw Exception("Provided socket is not valid! Cannot dial!");
-        }
-        _mode = SocketMode::ConnectTo;
-        _address = addr;
-        performDial(_address);
-    }
-}
-void
-SocketConnection::announce(const std::string& addr) {
-    if (_mode != SocketMode::Undefined) {
-        throw Exception("SocketConnection's mode is already set");
-    } else {
-        if (!isValidHandle()) {
-            throw Exception("Provided socket is not valid! Cannot announce!");
-        }
-        _mode = SocketMode::Listen;
-        _address = addr;
-        performAnnounce(_address);
-    }
-}
 } // end namespace kzr
+
+#endif // end KZR_UNIX_DOMAIN_SOCKET_CONNECTION_H__

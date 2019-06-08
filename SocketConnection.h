@@ -74,17 +74,28 @@ constexpr auto isCloseOnExec(SocketType t) noexcept {
 class SocketConnection : public FileHandleConnection {
     public:
         using Parent = FileHandleConnection;
+        enum class SocketMode {
+            Undefined,
+            ConnectTo,
+            Listen,
+        };
     public:
         SocketConnection(SocketDomain domain, SocketType type, int protocol = 0);
         virtual ~SocketConnection();
         constexpr auto getDomain() const noexcept { return _domain; }
         constexpr auto getType() const noexcept { return _type; }
         constexpr auto getProtocol() const noexcept { return _protocol; }
+        void dial(const std::string& address);
+        void announce(const std::string& address);
+    protected:
+        virtual void performDial(const std::string& address) = 0;
+        virtual void performAnnounce(const std::string& address) = 0;
     private:
         SocketDomain _domain;
         SocketType _type;
         int _protocol;
-
+        SocketMode _mode;
+        std::string _address;
 };
 
 } // end namespace kzr
