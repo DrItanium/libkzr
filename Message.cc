@@ -31,162 +31,168 @@
 
 namespace kzr {
 
-std::istream& 
-decode(std::istream& in, uint8_t& out) {
+void
+Message::decode(uint8_t& out) {
     char temporaryStorage;
-    in.get(temporaryStorage);
+    _storage.get(temporaryStorage);
     out = temporaryStorage;
-    return in;
 }
 
-std::ostream& 
-encode(std::ostream& out, uint8_t value) {
-    return out.put(value);
+void
+Message::encode(uint8_t value) {
+    _storage.put(value);
 }
 
-std::istream& 
-decode(std::istream& in, uint16_t& out) {
+void
+Message::decode(uint16_t& out) {
     char temporaryStorage[2];
-    in.read(temporaryStorage, 2);
+    _storage.read(temporaryStorage, 2);
     out = (uint16_t(temporaryStorage[1]) << 8) | (uint16_t(temporaryStorage[0]));
-    return in;
 }
 
-std::ostream& 
-encode(std::ostream& out, uint16_t value) {
-    out.put(uint8_t(value));
-    out.put(uint8_t(value >> 8));
-    return out;
+void
+Message::encode(uint16_t value) {
+    _storage.put(uint8_t(value));
+    _storage.put(uint8_t(value >> 8));
 }
 
-std::istream& 
-decode(std::istream& in, uint32_t& out) {
+void
+Message::decode(uint32_t& out) {
     char temporaryStorage[4];
-    in.read(temporaryStorage, 4);
+    _storage.read(temporaryStorage, 4);
     out = (uint32_t(temporaryStorage[3]) << 24) |
         (uint32_t(temporaryStorage[2]) << 16) | 
         (uint32_t(temporaryStorage[1]) << 8) | 
         (uint32_t(temporaryStorage[0]));
-    return in;
 }
 
-std::ostream& 
-encode(std::ostream& out, uint32_t value) {
-    out.put(uint8_t(value));
-    out.put(uint8_t(value >> 8));
-    out.put(uint8_t(value >> 16));
-    out.put(uint8_t(value >> 24));
-    return out;
+void
+Message::encode(uint32_t value) {
+    _storage.put(uint8_t(value));
+    _storage.put(uint8_t(value >> 8));
+    _storage.put(uint8_t(value >> 16));
+    _storage.put(uint8_t(value >> 24));
 }
 
-std::istream& 
-decode(std::istream& in, uint64_t& out) {
+void
+Message::decode(uint64_t& out) {
     uint32_t temporaryStorage[2];
-    decode(in, temporaryStorage[0]);
-    decode(in, temporaryStorage[1]);
+    decode(temporaryStorage[0]);
+    decode(temporaryStorage[1]);
     out = (uint64_t(temporaryStorage[1]) << 32) | 
         (uint64_t(temporaryStorage[0]));
-    return in;
 }
 
-std::ostream& 
-encode(std::ostream& out, uint64_t value) {
-    encode(out, uint32_t(value));
-    encode(out, uint32_t(value >> 32));
-    return out;
+void
+Message::encode(uint64_t value) {
+    encode(uint32_t(value));
+    encode(uint32_t(value >> 32));
 }
 
-std::istream& 
-decode(std::istream& in, std::string& data) {
+void
+Message::decode(std::string& data) {
     uint16_t len;
-    decode(in, len);
+    decode(len);
     data.reserve(len);
-    return in.read(data.data(), len);
+    _storage.read(data.data(), len);
 }
-std::ostream& 
-encode(std::ostream& out, const std::string& value) {
+void
+Message::encode(const std::string& value) {
     if (uint16_t len = value.length(); len != value.length()) {
         throw kzr::Exception("Attempted to encode a string of ", value.length(), " characters when ", ((decltype(len))-1), " is the maximum allowed!");
     } else {
-        encode(out, len);
+        encode(len);
         for (const auto& c : value) {
-            encode(out, uint8_t(c));
+            encode(uint8_t(c));
         }
-        return out;
     }
 }
 
-std::istream& 
-decode(std::istream& in, std::list<std::string>& collec) {
+void
+Message::decode(std::list<std::string>& collec) {
     uint16_t len;
-    decode(in, len); // we can discard this value as it doesn't matter
+    decode(len); // we can discard this value as it doesn't matter
     for (auto i = 0; i < len; ++i) {
         std::string temporary;
-        decode(in, temporary);
+        decode(temporary);
         collec.emplace_back(temporary);
     }
-    return in;
 }
-std::ostream&
-encode(std::ostream& out, const std::list<std::string>& collec) {
+void
+Message::encode(const std::list<std::string>& collec) {
     if (uint16_t len = collec.size(); len != collec.size()) {
         throw kzr::Exception("Attempted to encode a std::list<std::string> of ", collec.size(), " elements when ", ((decltype(len))-1), " is the maximum allowed!");
     } else {
-        encode(out, len);
+        encode(len);
         for (const auto& c : collec) {
-            encode(out, c);
+            encode(c);
         }
-        return out;
     }
 }
-std::istream& 
-decode(std::istream& in, std::vector<std::string>& collec) {
+void
+Message::decode(std::vector<std::string>& collec) {
     uint16_t len;
-    decode(in, len); // we can discard this value as it doesn't matter
+    decode(len); // we can discard this value as it doesn't matter
     for (auto i = 0; i < len; ++i) {
         std::string temporary;
-        decode(in, temporary);
+        decode(temporary);
         collec.emplace_back(temporary);
     }
-    return in;
 }
-std::ostream&
-encode(std::ostream& out, const std::vector<std::string>& collec) {
+void
+Message::encode(const std::vector<std::string>& collec) {
     if (uint16_t len = collec.size(); len != collec.size()) {
         throw kzr::Exception("Attempted to encode a std::vector<std::string> of ", collec.size(), " elements when ", ((decltype(len))-1), " is the maximum allowed!");
     } else {
-        encode(out, len);
+        encode(len);
         for (const auto& c : collec) {
-            encode(out, c);
+            encode(c);
         }
-        return out;
+    }
+}
+
+void
+Message::decode(std::set<std::string>& collec) {
+    uint16_t len;
+    decode(len); // we can discard this value as it doesn't matter
+    for (auto i = 0; i < len; ++i) {
+        std::string temporary;
+        decode(temporary);
+        collec.emplace(temporary);
+    }
+}
+void
+Message::encode(const std::set<std::string>& collec) {
+    if (uint16_t len = collec.size(); len != collec.size()) {
+        throw kzr::Exception("Attempted to encode a std::set<std::string> of ", collec.size(), " elements when ", ((decltype(len))-1), " is the maximum allowed!");
+    } else {
+        encode(len);
+        for (const auto& c : collec) {
+            encode(c);
+        }
     }
 }
 Action::Action(Operation op, uint16_t tag) : _op(op), _tag(tag) { }
 Action::Action(Operation op) : Action(op, -1) { }
 void 
-Action::encode(std::ostream& out) const {
-    kzr::encode(out, _op);
-    kzr::encode(out, _tag);
+Action::encode(Message& msg) const {
+    msg << _op << _tag;
 }
 void 
-Action::decode(std::istream& in) {
-    kzr::decode(in, _op);
-    kzr::decode(in, _tag);
+Action::decode(Message& msg) {
+    msg >> _op >> _tag;
 }
 
 void
-VersionAction::encode(std::ostream& out) const {
-    Parent::encode(out);
-    kzr::encode(out, _msize);
-    kzr::encode(out, _version);
+VersionAction::encode(Message& msg) const {
+    Parent::encode(msg);
+    msg << _msize << _version;
 }
 
 void
-VersionAction::decode(std::istream& in) {
-    Parent::decode(in);
-    kzr::decode(in, _msize);
-    kzr::decode(in, _version);
+VersionAction::decode(Message& msg) {
+    Parent::decode(msg);
+    msg >> _msize >> _version;
 }
 
 } // end namespace kzr

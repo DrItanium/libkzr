@@ -31,18 +31,18 @@
 
 namespace kzr {
 
-std::istream&
-decode(std::istream& in, Operation& op) {
+Message&
+operator>>(Message& in, Operation& op) {
     uint8_t temp;
-    kzr::decode(in, temp);
+    in.decode(temp);
     op = static_cast<Operation>(temp);
     return in;
 }
 
-std::ostream&
-encode(std::ostream& out, Operation op) {
-    kzr::encode(out, static_cast<uint8_t>(op));
-    return out;
+Message&
+operator<<(Message& msg, Operation op) {
+    msg.encode(uint8_t(op)); 
+    return msg;
 }
 
 

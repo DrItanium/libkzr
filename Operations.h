@@ -131,7 +131,8 @@ namespace kzr {
             }
         }
     }
-    std::ostream& encode(std::ostream&, Operation);
-    std::istream& decode(std::istream&, Operation&);
+    class Message;
+    Message& operator<<(Message&, Operation);
+    Message& operator>>(Message&, Operation&);
 } // end namespce kzr
 #endif // end KZR_OPERATIONS_H__
