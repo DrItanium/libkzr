@@ -44,7 +44,10 @@ namespace kzr {
  */
 class Message {
     public:
-        Message() = default;
+        auto read(std::stringstream::char_type* s, std::streamsize count);
+        auto read(std::string& str);
+        void write(const std::stringstream::char_type* s, std::streamsize count);
+        void write(const std::string& str);
         auto str() const;
         void str(const std::string& newStr);
         void reset();
@@ -66,40 +69,16 @@ class Message {
         void decode(T& data) {
             data.decode(*this);
         }
-        template<typename T, size_t capacity>
-        void decode(std::array<T, capacity>& collection) {
-            for (auto& ptr : collection) {
-                decode(ptr);
-            }
-        }
-        template<typename T, size_t capacity>
-        void encode(const std::array<T, capacity>& collec) {
-            for (const auto& ptr : collec) {
-                encode(ptr);
-            }
-        }
 #define X(type) \
-        Message& operator<<(type data) { \
-            encode(data); \
-            return *this;  \
-        } \
-        Message& operator>>(type & data ) { \
-            decode(data); \
-            return *this; \
-        }
+        Message& operator<<(type data); \
+        Message& operator>>(type& data)
         X(uint8_t);
         X(uint16_t);
         X(uint32_t);
         X(uint64_t);
 #undef X
-        Message& operator<<(const std::string& value) {
-            encode(value);
-            return *this;
-        }
-        Message& operator>>(std::string& value) {
-            decode(value);
-            return *this;
-        }
+        Message& operator<<(const std::string& value);
+        Message& operator>>(std::string& value);
     private:
         std::stringstream _storage;
 };
@@ -162,6 +141,7 @@ kzr::Message& operator<<(kzr::Message&, const std::set<std::string>&);
 kzr::Message& operator>>(kzr::Message&, std::list<std::string>&);
 kzr::Message& operator>>(kzr::Message&, std::vector<std::string>&);
 kzr::Message& operator>>(kzr::Message&, std::set<std::string>&);
+
 template<typename T, size_t capacity>
 kzr::Message& operator<<(kzr::Message& msg, const std::array<T, capacity>& a) {
     for (const auto& ptr : a) {

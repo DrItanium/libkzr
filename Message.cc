@@ -132,6 +132,62 @@ VersionAction::decode(Message& msg) {
     msg >> _msize >> _version;
 }
 
+auto Message::str() const { return _storage.str(); }
+void Message::str(const std::string& input) { _storage.str(input); }
+void Message::reset() { _storage.str(""); }
+Message& 
+Message::operator<<(const std::string& value) {
+    encode(value);
+    return *this;
+}
+Message& 
+Message::operator>>(std::string& value) {
+    decode(value);
+    return *this;
+}
+#define X(type) \
+        Message& \
+        Message::operator<<(type data) { \
+            encode(data); \
+            return *this;  \
+        } \
+        Message& \
+        Message::operator>>(type & data ) { \
+            decode(data); \
+            return *this; \
+        }
+        X(uint8_t);
+        X(uint16_t);
+        X(uint32_t);
+        X(uint64_t);
+#undef X
+
+void 
+Message::write(const std::stringstream::char_type* s, std::streamsize count) {
+    _storage.write(s, count);
+    if (_storage.bad()) {
+        throw kzr::Exception("bad bit set during write!");
+    }
+}
+void
+Message::write(const std::string& str) {
+    write(str.c_str(), str.length());
+}
+auto 
+Message::read(std::stringstream::char_type* s, std::streamsize count) {
+    _storage.read(s, count);
+    if (_storage.fail() || _storage.eof()) {
+        auto total = _storage.gcount();
+        _storage.clear(); // clear flags right now
+        return total;
+    } else {
+        return count;
+    }
+}
+auto 
+Message::read(std::string& str) {
+    return read(str.data(), str.length());
+}
 } // end namespace kzr
 kzr::Message&
 operator>>(kzr::Message& msg, std::set<std::string>& collec) {
