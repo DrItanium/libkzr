@@ -1,6 +1,7 @@
 /**
  * @file
- * Connection which sends and recieves bytes
+ * Connection which sends and recieves bytes to a file handle, automatically
+ * closed on destruction
  * @copyright
  * libkzr
  * Copyright (c) 2019, Joshua Scoggins 
@@ -26,28 +27,29 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef KZR_CONNECTION_H__
-#define KZR_CONNECTION_H__
+#ifndef KZR_FILE_HANDLE_CONNECTION_H__
+#define KZR_FILE_HANDLE_CONNECTION_H__
 #include <string>
-#include "Message.h"
+#include "Connection.h"
 namespace kzr {
 
-/**
- * Generic connection which reads and writes to messages.
- */
-class Connection {
+class FileHandleConnection : public Connection {
     public:
-        virtual ~Connection() = default;
-        void write(const Message&);
-        void read(Message&);
+        using Parent = Connection;
+    public:
+        FileHandleConnection(int fd, bool destroy = true);
+        virtual ~FileHandleConnection();
+        constexpr auto destroyOnDestruction() const noexcept { return _destroy; }
+        constexpr auto getHandle() const noexcept { return _handle; }
     protected:
-        [[nodiscard]] virtual size_t rawWrite(const std::string& data) = 0;
-        [[nodiscard]] virtual size_t rawRead(std::string& data) = 0;
+        [[nodiscard]] virtual size_t rawWrite(const std::string& data) override;
+        [[nodiscard]] virtual size_t rawRead(std::string& data) override;
+    private:
+        int _handle;
+        bool _destroy;
+
 };
 
 } // end namespace kzr
 
-kzr::Connection& operator<<(kzr::Connection&, const kzr::Message&);
-kzr::Connection& operator>>(kzr::Connection&, kzr::Message&);
-
-#endif // end KZR_CONNECTION_H__
+#endif // end KZR_FILE_HANDLE_CONNECTION_H__

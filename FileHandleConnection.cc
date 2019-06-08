@@ -1,6 +1,6 @@
 /**
  * @file
- * Connection which sends and recieves bytes
+ * Connection which sends and recieves bytes to a file handle
  * @copyright
  * libkzr
  * Copyright (c) 2019, Joshua Scoggins 
@@ -26,28 +26,27 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef KZR_CONNECTION_H__
-#define KZR_CONNECTION_H__
-#include <string>
-#include "Message.h"
+#include "FileHandleConnection.h"
+#include <cstdio>
+
 namespace kzr {
 
-/**
- * Generic connection which reads and writes to messages.
- */
-class Connection {
-    public:
-        virtual ~Connection() = default;
-        void write(const Message&);
-        void read(Message&);
-    protected:
-        [[nodiscard]] virtual size_t rawWrite(const std::string& data) = 0;
-        [[nodiscard]] virtual size_t rawRead(std::string& data) = 0;
-};
+FileHandleConnection::FileHandleConnection(int fd, bool destroy) : _handle(fd), _destroy(destroy) { }
+FileHandleConnection::~FileHandleConnection() { 
+    if (_destroy) {
+        ::close(_handle);
+    }
+}
+
+size_t
+FileHandleConnection::rawWrite(const std::string& data) {
+    return ::write(_handle, data.c_str(), data.size());
+}
+
+size_t
+FileHandleConnection::rawRead(std::string& data) {
+    return ::read(_handle, data.data(), data.capacity());
+}
+
 
 } // end namespace kzr
-
-kzr::Connection& operator<<(kzr::Connection&, const kzr::Message&);
-kzr::Connection& operator>>(kzr::Connection&, kzr::Message&);
-
-#endif // end KZR_CONNECTION_H__

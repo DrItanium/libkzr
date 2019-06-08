@@ -8,7 +8,8 @@ CXXFLAGS += '-DVERSION="$(VERSION)"' \
 LIBKZR_CORE_OBJS := Message.o \
 	Operations.o \
 	Exception.o \
-	Connection.o
+	Connection.o \
+	FileHandleConnection.o
 
 LIBKZR_ARCHIVE := libkzr.a
 
@@ -44,7 +45,10 @@ clean:
 # generated via g++ -MM -std=c++17 *.cc
 
 
-Connection.o: Connection.cc Connection.h Message.h Operations.h
+Connection.o: Connection.cc Connection.h Message.h Operations.h \
+ Exception.h
 Exception.o: Exception.cc Exception.h
+FileHandleConnection.o: FileHandleConnection.cc FileHandleConnection.h \
+ Connection.h Message.h Operations.h
 Message.o: Message.cc Message.h Operations.h Exception.h
 Operations.o: Operations.cc Operations.h Message.h
