@@ -27,7 +27,7 @@
  */
 
 #include "FileHandleConnection.h"
-#include <cstdio>
+#include <unistd.h>
 
 namespace kzr {
 
