@@ -87,9 +87,10 @@ class SocketConnection : public FileHandleConnection {
         constexpr auto getProtocol() const noexcept { return _protocol; }
         void dial(const std::string& address);
         void announce(const std::string& address);
+        const std::string& getAddress() const noexcept { return _address; }
     protected:
-        virtual void performDial(const std::string& address) = 0;
-        virtual void performAnnounce(const std::string& address) = 0;
+        virtual void performDial() = 0;
+        virtual void performAnnounce() = 0;
     private:
         SocketDomain _domain;
         SocketType _type;

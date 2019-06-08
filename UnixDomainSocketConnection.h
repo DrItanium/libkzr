@@ -35,11 +35,12 @@ class UnixDomainSocketConnection : public SocketConnection {
     public:
         using Parent = SocketConnection;
     public:
-        UnixDomainSocketConnection(const std::string& address);
+        UnixDomainSocketConnection();
         virtual ~UnixDomainSocketConnection();
-        std::string getAddress() const noexcept { return _address; }
+    protected:
+        virtual void performDial() override;
+        virtual void performAnnounce() override;
     private:
-        std::string _address;
 
 };
 

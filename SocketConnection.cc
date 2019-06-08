@@ -44,7 +44,7 @@ SocketConnection::dial(const std::string& addr) {
         }
         _mode = SocketMode::ConnectTo;
         _address = addr;
-        performDial(_address);
+        performDial();
     }
 }
 void
@@ -57,7 +57,7 @@ SocketConnection::announce(const std::string& addr) {
         }
         _mode = SocketMode::Listen;
         _address = addr;
-        performAnnounce(_address);
+        performAnnounce();
     }
 }
 } // end namespace kzr
