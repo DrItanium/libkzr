@@ -162,28 +162,28 @@ encode(std::ostream& out, const std::vector<std::string>& collec) {
         return out;
     }
 }
-Message::Message(Operation op, uint16_t tag) : _op(op), _tag(tag) { }
-Message::Message(Operation op) : Message(op, -1) { }
+Action::Action(Operation op, uint16_t tag) : _op(op), _tag(tag) { }
+Action::Action(Operation op) : Action(op, -1) { }
 void 
-Message::encode(std::ostream& out) const {
+Action::encode(std::ostream& out) const {
     kzr::encode(out, _op);
     kzr::encode(out, _tag);
 }
 void 
-Message::decode(std::istream& in) {
+Action::decode(std::istream& in) {
     kzr::decode(in, _op);
     kzr::decode(in, _tag);
 }
 
 void
-VersionMessage::encode(std::ostream& out) const {
+VersionAction::encode(std::ostream& out) const {
     Parent::encode(out);
     kzr::encode(out, _msize);
     kzr::encode(out, _version);
 }
 
 void
-VersionMessage::decode(std::istream& in) {
+VersionAction::decode(std::istream& in) {
     Parent::decode(in);
     kzr::decode(in, _msize);
     kzr::decode(in, _version);

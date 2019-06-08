@@ -34,9 +34,70 @@
 #include <array>
 #include <list>
 #include <vector>
+#include <set>
+#include <sstream>
 #include "Operations.h"
 
 namespace kzr {
+/**
+ * A memory stream used to encode and decode messages
+ */
+class Message {
+    public:
+        Message() = default;
+        auto str() const;
+        void str(const std::string& newStr);
+        void reset();
+        void encode(uint8_t value);
+        void encode(uint16_t value);
+        void encode(uint32_t value);
+        void encode(uint64_t value);
+        void encode(const std::string& value);
+        void encode(const std::list<std::string>& value);
+        void encode(const std::vector<std::string>& value);
+        void encode(const std::set<std::string>& value);
+        void decode(uint8_t& value);
+        void decode(uint16_t& value);
+        void decode(uint32_t& value);
+        void decode(uint64_t& value);
+        void decode(std::string& value);
+        void decode(std::list<std::string>& value);
+        void decode(std::vector<std::string>& value);
+        void decode(std::set<std::string>& value);
+        template<typename T>
+        void encode(const T& data) {
+            data.encode(*this);
+        }
+        template<typename T>
+        void decode(T& data) {
+            data.decode(*this);
+        }
+        template<typename T, size_t capacity>
+        void decode(std::array<T, capacity>& collection) {
+            for (auto& ptr : collection) {
+                decode(ptr);
+            }
+        }
+        template<typename T, size_t capacity>
+        void encode(const std::array<T, capacity>& collec) {
+            for (const auto& ptr : collec) {
+                encode(ptr);
+            }
+        }
+        template<typename ... Types>
+        void encodeSequence(Types&& ... args) {
+            static_assert((std::is_const_v<std::forward<Types>(args)> && ...), "All types in the encode sequence must be marked const!");
+            (encode(std::forward<Types>(args)), ...);
+        }
+        template<typename ... Types>
+        void decodeSequence(Types&& ... args) {
+            static_assert((!std::is_const_v<std::forward<Types>(args)> && ...), "All types in the encode sequence must not be const!");
+            static_assert((std::is_reference_v<std::forward<Types>(args)> && ...), "All types in the encode sequence must be a reference!");
+            (decode(std::forward<Types>(args)), ...);
+        }
+    private:
+        std::stringstream _storage;
+};
 /**
  * Generic version of decoding messages, it assumes the class/struct has a
  * decode method.
@@ -128,12 +189,12 @@ std::ostream& encode(std::ostream& out, const std::list<T>& collection) {
  * Holds the arguments of a request by the client or a response by the server;
  * This top level class contains the elements common to all message kinds
  */
-class Message {
+class Action {
     public:
-        Message() = default;
-        Message(Operation op, uint16_t tag);
-        explicit Message(Operation op);
-        virtual ~Message() = default;
+        Action() = default;
+        Action(Operation op, uint16_t tag);
+        explicit Action(Operation op);
+        virtual ~Action() = default;
         constexpr auto getOperation() const noexcept { return _op; }
         constexpr auto getTag() const noexcept { return _tag; }
         void setTag(uint16_t value) noexcept { _tag = value; }
@@ -145,12 +206,12 @@ class Message {
         uint16_t _tag;
 };
 
-class VersionMessage : public Message {
+class VersionAction : public Action {
     public:
-        using Parent = Message;
+        using Parent = Action;
     public:
         using Parent::Parent;
-        virtual ~VersionMessage() = default;
+        virtual ~VersionAction() = default;
         void encode(std::ostream&) const override;
         void decode(std::istream&) override;
         auto getVersion() const noexcept { return _version; }
