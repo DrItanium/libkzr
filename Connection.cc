@@ -27,6 +27,7 @@
  */
 
 #include "Connection.h"
+#include "Exception.h"
 #include <sstream>
 
 
@@ -39,8 +40,8 @@ Connection::write(const Message& msg) {
     if (auto len = contents.length(); len != (uint32_t(len))) {
         throw Exception("length of the message is too long to write out!");
     } else {
-        auto acutalLen = uint32_t(len) + 4; // need to include the four bytes for the length field
         std::ostringstream newStr;
+        auto actualLen = uint32_t(len) + 4; // need to include the four bytes for the length field
         // shove the size before
         newStr.put(uint8_t(actualLen));
         newStr.put(uint8_t(actualLen >> 8));
@@ -78,3 +79,15 @@ Connection::read(Message& msg) {
     }
 }
 } // end namespace kzr
+
+kzr::Connection&
+operator<<(kzr::Connection& c, const kzr::Message& msg) {
+    c.write(msg);
+    return c;
+}
+
+kzr::Connection&
+operator>>(kzr::Connection& c, kzr::Message& msg) {
+    c.read(msg);
+    return c;
+}

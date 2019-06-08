@@ -132,7 +132,10 @@ VersionAction::decode(Message& msg) {
     msg >> _msize >> _version;
 }
 
-auto Message::str() const { return _storage.str(); }
+std::string
+Message::str() const { 
+    return _storage.str(); 
+}
 void Message::str(const std::string& input) { _storage.str(input); }
 void Message::reset() { _storage.str(""); }
 Message& 

@@ -58,7 +58,7 @@ class Message {
         auto read(std::string& str);
         void write(const std::stringstream::char_type* s, std::streamsize count);
         void write(const std::string& str);
-        [[nodiscard]] auto str() const;
+        [[nodiscard]] std::string str() const;
         void str(const std::string& newStr);
         void reset();
         void encode(uint8_t value);

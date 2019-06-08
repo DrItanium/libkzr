@@ -47,4 +47,7 @@ class Connection {
 
 } // end namespace kzr
 
+kzr::Connection& operator<<(kzr::Connection&, const kzr::Message&);
+kzr::Connection& operator>>(kzr::Connection&, kzr::Message&);
+
 #endif // end KZR_CONNECTION_H__
