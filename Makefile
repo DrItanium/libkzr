@@ -9,7 +9,8 @@ LIBKZR_CORE_OBJS := Message.o \
 	Operations.o \
 	Exception.o \
 	Connection.o \
-	FileHandleConnection.o
+	FileHandleConnection.o \
+	SocketConnection.o
 
 LIBKZR_ARCHIVE := libkzr.a
 
@@ -52,3 +53,5 @@ FileHandleConnection.o: FileHandleConnection.cc FileHandleConnection.h \
  Connection.h Message.h Operations.h
 Message.o: Message.cc Message.h Operations.h Exception.h
 Operations.o: Operations.cc Operations.h Message.h
+SocketConnection.o: SocketConnection.cc SocketConnection.h \
+ FileHandleConnection.h Connection.h Message.h Operations.h
