@@ -79,6 +79,7 @@ class Message {
 #undef X
         Message& operator<<(const std::string& value);
         Message& operator>>(std::string& value);
+        auto length() const noexcept { return _storage.str().length(); }
     private:
         std::stringstream _storage;
 };
