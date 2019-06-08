@@ -36,9 +36,19 @@
 #include <vector>
 #include <set>
 #include <sstream>
+#include <tuple>
 #include "Operations.h"
 
 namespace kzr {
+constexpr uint16_t build(uint8_t lower, uint8_t upper) noexcept {
+    return (uint16_t(upper) << 8) | uint16_t(lower);
+}
+constexpr uint32_t build(uint16_t lower, uint16_t upper) noexcept {
+    return (uint32_t(upper) << 16) | uint16_t(lower);
+}
+constexpr uint32_t build(uint8_t lowest, uint8_t lower, uint8_t high, uint8_t highest) noexcept {
+    return build(build(lowest, lower), build(high, highest));
+}
 /**
  * A memory stream used to encode and decode messages
  */

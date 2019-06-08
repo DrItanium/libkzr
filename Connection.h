@@ -41,8 +41,8 @@ class Connection {
         void write(const Message&);
         void read(Message&);
     protected:
-        virtual void rawWrite(const std::string& data) = 0;
-        virtual void rawRead(std::string& data) = 0;
+        [[nodiscard]] virtual size_t rawWrite(const std::string& data) = 0;
+        [[nodiscard]] virtual size_t rawRead(std::string& data) = 0;
 };
 
 } // end namespace kzr
