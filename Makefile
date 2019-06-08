@@ -56,6 +56,6 @@ Message.o: Message.cc Message.h Operations.h Exception.h
 Operations.o: Operations.cc Operations.h Message.h
 SocketConnection.o: SocketConnection.cc SocketConnection.h \
  FileHandleConnection.h Connection.h Message.h Operations.h Exception.h
-UnixDomainSocketConnection.o: UnixDomainSocketConnection.cc \
+UnixDomainSocketConnection.o: UnixDomainSocketConnection.cc Exception.h \
  UnixDomainSocketConnection.h SocketConnection.h FileHandleConnection.h \
  Connection.h Message.h Operations.h
