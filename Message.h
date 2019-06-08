@@ -53,17 +53,11 @@ class Message {
         void encode(uint32_t value);
         void encode(uint64_t value);
         void encode(const std::string& value);
-        void encode(const std::list<std::string>& value);
-        void encode(const std::vector<std::string>& value);
-        void encode(const std::set<std::string>& value);
         void decode(uint8_t& value);
         void decode(uint16_t& value);
         void decode(uint32_t& value);
         void decode(uint64_t& value);
         void decode(std::string& value);
-        void decode(std::list<std::string>& value);
-        void decode(std::vector<std::string>& value);
-        void decode(std::set<std::string>& value);
         template<typename T>
         void encode(const T& data) {
             data.encode(*this);
@@ -84,16 +78,6 @@ class Message {
                 encode(ptr);
             }
         }
-        template<typename T>
-        Message& operator<<(const T& data) {
-            encode(data);
-            return *this;
-        }
-        template<typename T>
-        Message& operator>>(T& data) {
-            decode(data);
-            return *this;
-        }
 #define X(type) \
         Message& operator<<(type data) { \
             encode(data); \
@@ -108,9 +92,18 @@ class Message {
         X(uint32_t);
         X(uint64_t);
 #undef X
+        Message& operator<<(const std::string& value) {
+            encode(value);
+            return *this;
+        }
+        Message& operator>>(std::string& value) {
+            decode(value);
+            return *this;
+        }
     private:
         std::stringstream _storage;
 };
+
 
 
 /**
@@ -152,5 +145,37 @@ class VersionAction : public Action {
 };
 
 } // end namespace kzr
+
+template<typename T>
+kzr::Message& operator<<(kzr::Message& msg, const T& value) {
+    msg.encode<T>(value);
+    return msg;
+}
+template<typename T>
+kzr::Message& operator>>(kzr::Message& msg, T& value) {
+    msg.decode<T>(value);
+    return msg;
+}
+kzr::Message& operator<<(kzr::Message&, const std::list<std::string>&);
+kzr::Message& operator<<(kzr::Message&, const std::vector<std::string>&);
+kzr::Message& operator<<(kzr::Message&, const std::set<std::string>&);
+kzr::Message& operator>>(kzr::Message&, std::list<std::string>&);
+kzr::Message& operator>>(kzr::Message&, std::vector<std::string>&);
+kzr::Message& operator>>(kzr::Message&, std::set<std::string>&);
+template<typename T, size_t capacity>
+kzr::Message& operator<<(kzr::Message& msg, const std::array<T, capacity>& a) {
+    for (const auto& ptr : a) {
+        msg << ptr;
+    }
+    return msg;
+}
+
+template<typename T, size_t capacity>
+kzr::Message& operator>>(kzr::Message& msg, std::array<T, capacity>& a) {
+    for (auto& ptr : a) {
+        msg >> ptr;
+    }
+    return msg;
+}
 #endif // end KZR_MESSAGE_H__
 

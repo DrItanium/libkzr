@@ -108,70 +108,7 @@ Message::encode(const std::string& value) {
     }
 }
 
-void
-Message::decode(std::list<std::string>& collec) {
-    uint16_t len;
-    decode(len); // we can discard this value as it doesn't matter
-    for (auto i = 0; i < len; ++i) {
-        std::string temporary;
-        decode(temporary);
-        collec.emplace_back(temporary);
-    }
-}
-void
-Message::encode(const std::list<std::string>& collec) {
-    if (uint16_t len = collec.size(); len != collec.size()) {
-        throw kzr::Exception("Attempted to encode a std::list<std::string> of ", collec.size(), " elements when ", ((decltype(len))-1), " is the maximum allowed!");
-    } else {
-        encode(len);
-        for (const auto& c : collec) {
-            encode(c);
-        }
-    }
-}
-void
-Message::decode(std::vector<std::string>& collec) {
-    uint16_t len;
-    decode(len); // we can discard this value as it doesn't matter
-    for (auto i = 0; i < len; ++i) {
-        std::string temporary;
-        decode(temporary);
-        collec.emplace_back(temporary);
-    }
-}
-void
-Message::encode(const std::vector<std::string>& collec) {
-    if (uint16_t len = collec.size(); len != collec.size()) {
-        throw kzr::Exception("Attempted to encode a std::vector<std::string> of ", collec.size(), " elements when ", ((decltype(len))-1), " is the maximum allowed!");
-    } else {
-        encode(len);
-        for (const auto& c : collec) {
-            encode(c);
-        }
-    }
-}
 
-void
-Message::decode(std::set<std::string>& collec) {
-    uint16_t len;
-    decode(len); // we can discard this value as it doesn't matter
-    for (auto i = 0; i < len; ++i) {
-        std::string temporary;
-        decode(temporary);
-        collec.emplace(temporary);
-    }
-}
-void
-Message::encode(const std::set<std::string>& collec) {
-    if (uint16_t len = collec.size(); len != collec.size()) {
-        throw kzr::Exception("Attempted to encode a std::set<std::string> of ", collec.size(), " elements when ", ((decltype(len))-1), " is the maximum allowed!");
-    } else {
-        encode(len);
-        for (const auto& c : collec) {
-            encode(c);
-        }
-    }
-}
 Action::Action(Operation op, uint16_t tag) : _op(op), _tag(tag) { }
 Action::Action(Operation op) : Action(op, -1) { }
 void 
@@ -196,3 +133,73 @@ VersionAction::decode(Message& msg) {
 }
 
 } // end namespace kzr
+kzr::Message&
+operator>>(kzr::Message& msg, std::set<std::string>& collec) {
+    uint16_t len;
+    msg >> len;
+    for (auto i = 0; i < len; ++i) {
+        std::string temporary;
+        msg >> temporary;
+        collec.emplace(temporary);
+    }
+    return msg;
+}
+kzr::Message&
+operator<<(kzr::Message& msg, const std::set<std::string>& collec) {
+    if (uint16_t len = collec.size(); len != collec.size()) {
+        throw kzr::Exception("Attempted to encode a std::set<std::string> of ", collec.size(), " elements when ", ((decltype(len))-1), " is the maximum allowed!");
+    } else {
+        msg << len;
+        for (const auto& c : collec) {
+            msg << c;
+        }
+        return msg;
+    }
+}
+
+kzr::Message&
+operator>>(kzr::Message& msg, std::vector<std::string>& collec) {
+    uint16_t len;
+    msg >> len;
+    for (auto i = 0; i < len; ++i) {
+        std::string temporary;
+        msg >> temporary;
+        collec.emplace_back(temporary);
+    }
+    return msg;
+}
+kzr::Message&
+operator<<(kzr::Message& msg, const std::vector<std::string>& collec) {
+    if (uint16_t len = collec.size(); len != collec.size()) {
+        throw kzr::Exception("Attempted to encode a std::vector<std::string> of ", collec.size(), " elements when ", ((decltype(len))-1), " is the maximum allowed!");
+    } else {
+        msg << len;
+        for (const auto& c : collec) {
+            msg << c;
+        }
+        return msg;
+    }
+}
+kzr::Message&
+operator>>(kzr::Message& msg, std::list<std::string>& collec) {
+    uint16_t len;
+    msg >> len;
+    for (auto i = 0; i < len; ++i) {
+        std::string temporary;
+        msg >> temporary;
+        collec.emplace_back(temporary);
+    }
+    return msg;
+}
+kzr::Message&
+operator<<(kzr::Message& msg, const std::list<std::string>& collec) {
+    if (uint16_t len = collec.size(); len != collec.size()) {
+        throw kzr::Exception("Attempted to encode a std::list<std::string> of ", collec.size(), " elements when ", ((decltype(len))-1), " is the maximum allowed!");
+    } else {
+        msg << len;
+        for (const auto& c : collec) {
+            msg << c;
+        }
+        return msg;
+    }
+}

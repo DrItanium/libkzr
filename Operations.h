@@ -132,7 +132,7 @@ namespace kzr {
         }
     }
     class Message;
-    Message& operator<<(Message&, Operation);
-    Message& operator>>(Message&, Operation&);
 } // end namespce kzr
+kzr::Message& operator<<(kzr::Message&, kzr::Operation);
+kzr::Message& operator>>(kzr::Message&, kzr::Operation&);
 #endif // end KZR_OPERATIONS_H__

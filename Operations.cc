@@ -29,21 +29,19 @@
 #include "Operations.h"
 #include "Message.h" // need some of the other encode operations
 
-namespace kzr {
 
-Message&
-operator>>(Message& in, Operation& op) {
+kzr::Message&
+operator>>(kzr::Message& in, kzr::Operation& op) {
     uint8_t temp;
     in.decode(temp);
-    op = static_cast<Operation>(temp);
+    op = static_cast<kzr::Operation>(temp);
     return in;
 }
 
-Message&
-operator<<(Message& msg, Operation op) {
+kzr::Message&
+operator<<(kzr::Message& msg, kzr::Operation op) {
     msg.encode(uint8_t(op)); 
     return msg;
 }
 
 
-} // end namespace kzr
