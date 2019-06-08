@@ -31,7 +31,5 @@
 namespace kzr {
 SocketConnection::SocketConnection(SocketDomain dom, SocketType typ, int protocol) : Parent(socket(int(dom), int(typ), protocol), true), _domain(dom), _type(typ), _protocol(protocol) { }
 
-SocketConnection::~SocketConnection() {
-    
-}
+SocketConnection::~SocketConnection() { }
 } // end namespace kzr

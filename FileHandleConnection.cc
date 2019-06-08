@@ -33,19 +33,28 @@ namespace kzr {
 
 FileHandleConnection::FileHandleConnection(int fd, bool destroy) : _handle(fd), _destroy(destroy) { }
 FileHandleConnection::~FileHandleConnection() { 
-    if (_destroy) {
+    if (isValidHandle() && _destroy) {
         ::close(_handle);
     }
 }
 
 size_t
 FileHandleConnection::rawWrite(const std::string& data) {
-    return ::write(_handle, data.c_str(), data.size());
+    if (isValidHandle()) {
+        return ::write(_handle, data.c_str(), data.size());
+    } else {
+        return 0;
+    }
+    
 }
 
 size_t
 FileHandleConnection::rawRead(std::string& data) {
-    return ::read(_handle, data.data(), data.capacity());
+    if (isValidHandle()) {
+        return ::read(_handle, data.data(), data.capacity());
+    } else {
+        return 0;
+    }
 }
 
 
