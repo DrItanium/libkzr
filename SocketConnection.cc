@@ -1,7 +1,6 @@
 /**
  * @file
- * Connection which sends and recieves bytes to a file handle, automatically
- * closed on destruction
+ * A file handle based connection which refers to an open socket.
  * @copyright
  * libkzr
  * Copyright (c) 2019, Joshua Scoggins 
@@ -26,31 +25,13 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-#ifndef KZR_FILE_HANDLE_CONNECTION_H__
-#define KZR_FILE_HANDLE_CONNECTION_H__
-#include <string>
-#include "Connection.h"
+#include <sys/types.h>
+#include <sys/socket.h>
+#include "SocketConnection.h"
 namespace kzr {
+SocketConnection::SocketConnection(SocketDomain dom, SocketType typ, int protocol) : Parent(socket(int(dom), int(typ), protocol), true), _domain(dom), _type(typ), _protocol(protocol) { }
 
-class FileHandleConnection : public Connection {
-    public:
-        using Parent = Connection;
-    public:
-        FileHandleConnection(int fd, bool destroy = true);
-        virtual ~FileHandleConnection();
-        constexpr auto destroyOnDestruction() const noexcept { return _destroy; }
-        constexpr auto getHandle() const noexcept { return _handle; }
-        constexpr auto isValidHandle() const noexcept { return _handle >= 0; }
-    protected:
-        [[nodiscard]] virtual size_t rawWrite(const std::string& data) override;
-        [[nodiscard]] virtual size_t rawRead(std::string& data) override;
-    private:
-        int _handle;
-        bool _destroy;
-
-};
-
+SocketConnection::~SocketConnection() {
+    
+}
 } // end namespace kzr
-
-#endif // end KZR_FILE_HANDLE_CONNECTION_H__
