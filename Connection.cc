@@ -48,7 +48,9 @@ Connection::write(const Message& msg) {
         newStr.put(uint8_t(actualLen >> 16));
         newStr.put(uint8_t(actualLen >> 24));
         newStr << contents;
-        rawWrite(newStr.str());
+        if (auto bytesWritten = rawWrite(newStr.str()); bytesWritten != actualLen) {
+            throw Exception("Only wrote ", bytesWritten, "bytes of a ", actualLen, " bytes long message!");
+        }
     }
 }
 void
