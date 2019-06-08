@@ -1,6 +1,6 @@
 /**
  * @file
- * A unix domain socket connection.
+ * A unix domain socket connection implementation.
  * @copyright
  * libkzr
  * Copyright (c) 2019, Joshua Scoggins 
@@ -26,29 +26,58 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef KZR_UNIX_DOMAIN_SOCKET_CONNECTION_H__
-#define KZR_UNIX_DOMAIN_SOCKET_CONNECTION_H__
-#include <string>
-#include "SocketConnection.h"
+#include "Exception.h"
+#include "UnixDomainSocketConnection.h"
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <sys/stat.h>
 #include <unistd.h>
+#include <csignal>
 namespace kzr {
-class UnixDomainSocketConnection : public SocketConnection {
-    public:
-        using Parent = SocketConnection;
-    public:
-        UnixDomainSocketConnection();
-        virtual ~UnixDomainSocketConnection();
-    protected:
-        virtual void performDial() override;
-        virtual void performAnnounce() override;
-    private:
-        void setupStructures(sockaddr_un&, socklen_t&);
+UnixDomainSocketConnection::UnixDomainSocketConnection() : Parent(SocketDomain::Unix, SocketType::Stream, 0) { }
+UnixDomainSocketConnection::~UnixDomainSocketConnection() { }
 
-};
+void
+UnixDomainSocketConnection::setupStructures(sockaddr_un& sa, socklen_t& salen) {
+    memset(&sa, 0, sizeof(decltype(sa)));
+    sa.sun_family = AF_UNIX;
+    getAddress().copy(sa.sun_path, sizeof(sa.sun_path));
+    salen = SUN_LEN(&sa);
+}
+
+void
+UnixDomainSocketConnection::performDial() {
+    sockaddr_un sa;
+    socklen_t salen;
+
+    setupStructures(sa, salen);
+    if (::connect(getHandle(), (sockaddr*)&sa, salen)) {
+        throw Exception("Could not connect to unix domain socket");
+    } 
+}
+
+void
+UnixDomainSocketConnection::performAnnounce() {
+    sockaddr_un sa;
+    socklen_t salen;
+    constexpr auto maximumCacheSize = 32u;
+
+    std::signal(SIGPIPE, SIG_IGN);
+    setupStructures(sa, salen);
+    const int yes = 1;
+    if (setsockopt(getHandle(), SOL_SOCKET, SO_REUSEADDR, (void*)&yes, sizeof(yes)) < 0) {
+        throw Exception("Could not set socket options!");
+    } 
+    ::unlink(getAddress().c_str());
+    if (bind(getHandle(), (sockaddr*)&sa, salen) < 0) {
+        throw Exception("Could not bind socket!");
+    } 
+    ::chmod(getAddress().c_str(), S_IRWXU);
+    if (::listen(getHandle(), maximumCacheSize) < 0) {
+        throw Exception("Could not listen on socket!");
+    }
+}
 
 } // end namespace kzr
 
-#endif // end KZR_UNIX_DOMAIN_SOCKET_CONNECTION_H__
