@@ -30,6 +30,7 @@
 #include <cstdint>
 #include <istream>
 #include <ostream>
+#include <tuple>
 namespace kzr {
     enum class Operation : uint8_t {
 #define X(kind, value) \
@@ -51,6 +52,7 @@ namespace kzr {
         X(WStat, 126),
 #undef X
     };
+
     template<typename T>
     constexpr auto isEven(T value) noexcept {
         return (value & 1) == 0;
@@ -105,7 +107,7 @@ namespace kzr {
                 return false;
         }
     }
-    constexpr auto expectedOperationKind(Operation op) noexcept {
+    constexpr auto expectedResponseKind(Operation op) noexcept {
         if (isRMessage(op)) {
             return Operation::RError;
         } else {

@@ -117,6 +117,7 @@ class Action {
         uint16_t _tag;
 };
 
+
 class VersionAction : public Action {
     public:
         using Parent = Action;
@@ -133,6 +134,64 @@ class VersionAction : public Action {
         std::string _version;
         uint16_t _msize;
 };
+class ErrorResponse : public Action {
+    public:
+        using Parent = Action;
+    public:
+        using Parent::Parent;
+        virtual ~ErrorResponse() = default;
+        void encode(Message&) const override;
+        void decode(Message&) override;
+        auto getName() const noexcept { return _ename; }
+        void setName(const std::string& value) noexcept { _ename = value; }
+    private:
+        std::string _ename;
+};
+
+class FlushAction : public Action {
+    public:
+        using Parent = Action;
+    public:
+        using Parent::Parent;
+        virtual ~FlushAction() = default;
+        void encode(Message&) const override;
+        void decode(Message&) override;
+        constexpr auto getOldTag() const noexcept { return _oldtag; }
+        void setOld(uint16_t value) noexcept { _oldtag = value; }
+    private:
+        uint16_t _oldtag;
+};
+
+template<Operation op>
+struct OperationToTypeBinding final {
+    OperationToTypeBinding() = delete;
+    ~OperationToTypeBinding() = delete;
+    OperationToTypeBinding(const OperationToTypeBinding&) = delete;
+    OperationToTypeBinding(OperationToTypeBinding&&) = delete;
+    OperationToTypeBinding& operator=(const OperationToTypeBinding&) = delete;
+    OperationToTypeBinding& operator=(OperationToTypeBinding&&) = delete;
+    static constexpr auto TargetOperation = op;
+};
+
+#define DefTypeBinding(op, type) \
+    template<> \
+    struct OperationToTypeBinding<Operation:: op > final { \
+    OperationToTypeBinding() = delete; \
+    ~OperationToTypeBinding() = delete; \
+    OperationToTypeBinding(const OperationToTypeBinding&) = delete; \
+    OperationToTypeBinding(OperationToTypeBinding&&) = delete; \
+    OperationToTypeBinding& operator=(const OperationToTypeBinding&) = delete; \
+    OperationToTypeBinding& operator=(OperationToTypeBinding&&) = delete; \
+    static constexpr auto TargetOperation = Operation:: op ; \
+    using BoundType = type ; \
+    }
+#define X(op, type) DefTypeBinding(op, type)
+X(TVersion, VersionAction);
+X(RVersion, VersionAction);
+#undef X
+#undef DefTypeBinding
+
+
 
 } // end namespace kzr
 
