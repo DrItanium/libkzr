@@ -206,6 +206,18 @@ ErrorResponse::decode(Message& msg) {
     msg >> _ename;
 }
 
+void
+Qid::encode(Message& msg) const {
+    msg << _type << _version << _path;
+}
+
+void
+Qid::decode(Message& msg) {
+    msg >> _type >> _version >> _path;
+}
+
+Qid::Qid(uint8_t t, uint64_t path, uint32_t version) : _type(t), _version(version), _path(path) { }
+
 
 } // end namespace kzr
 kzr::Message&
