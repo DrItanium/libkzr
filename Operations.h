@@ -61,10 +61,10 @@ namespace kzr {
     constexpr auto isOdd(T value) noexcept {
         return !isEven(value);
     }
-    constexpr auto isTMessage(Operation op) noexcept {
+    constexpr auto isRequest(Operation op) noexcept {
         return isEven<uint8_t>(static_cast<uint8_t>(op));
     }
-    constexpr auto isRMessage(Operation op) noexcept {
+    constexpr auto isResponse(Operation op) noexcept {
         return isOdd<uint8_t>(static_cast<uint8_t>(op));
     }
     constexpr auto isSessionClass(Operation op) noexcept {
@@ -108,7 +108,7 @@ namespace kzr {
         }
     }
     constexpr auto expectedResponseKind(Operation op) noexcept {
-        if (isRMessage(op)) {
+        if (isResponse(op)) {
             return Operation::RError;
         } else {
             // must be a transmit message

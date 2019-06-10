@@ -191,6 +191,22 @@ auto
 Message::read(std::string& str) {
     return read(str.data(), str.length());
 }
+
+ErrorResponse::ErrorResponse() : Parent(Operation::RError) { }
+ErrorResponse::ErrorResponse(uint16_t tag) : Parent(Operation::RError, tag) { }
+
+void 
+ErrorResponse::encode(Message& msg) const {
+    Parent::encode(msg);
+    msg << _ename;
+}
+void
+ErrorResponse::decode(Message& msg) {
+    Parent::decode(msg);
+    msg >> _ename;
+}
+
+
 } // end namespace kzr
 kzr::Message&
 operator>>(kzr::Message& msg, std::set<std::string>& collec) {

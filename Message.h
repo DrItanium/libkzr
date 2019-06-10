@@ -94,6 +94,26 @@ class Message {
         std::stringstream _storage;
 };
 
+/**
+ * A unique identification for the given file being accessed
+ */
+class Qid  {
+    public:
+        Qid() = default;
+        Qid(uint8_t type, uint64_t path, uint32_t version = 0);
+        void setType(uint8_t v) noexcept { _type = v; }
+        void setVersion(uint32_t v) noexcept { _version = v; }
+        void setPath(uint64_t v) noexcept { _path = v; }
+        constexpr auto getType() const noexcept { return _type; }
+        constexpr auto getVersion() const noexcept { return _version; }
+        constexpr auto getPath() const noexcept { return _path; }
+        void encode(Message&) const;
+        void decode(Message&);
+    private:
+        uint8_t _type;
+        uint32_t _version;
+        uint64_t _path;
+};
 
 
 /**
@@ -103,20 +123,35 @@ class Message {
 class Action {
     public:
         Action() = default;
-        Action(Operation op, uint16_t tag);
         explicit Action(Operation op);
+        Action(Operation op, uint16_t tag);
         virtual ~Action() = default;
-        constexpr auto getOperation() const noexcept { return _op; }
         constexpr auto getTag() const noexcept { return _tag; }
         void setTag(uint16_t value) noexcept { _tag = value; }
-        void setOperation(Operation value) noexcept { _op = value; }
-        virtual void encode(Message&) const;
-        virtual void decode(Message&);
+        void setOperation(Operation op) noexcept { _op = op; }
+        virtual void encode(Message& msg) const;
+        virtual void decode(Message& msg);
+        constexpr auto getOperation() const noexcept { return _op; }
+        constexpr auto isRequest() const noexcept { return kzr::isRequest(_op); }
+        constexpr auto isResponse() const noexcept { return kzr::isResponse(_op); }
     private:
         Operation _op;
         uint16_t _tag;
 };
-
+class ErrorResponse : public Action {
+    public:
+        using Parent = Action;
+    public:
+        ErrorResponse();
+        explicit ErrorResponse(uint16_t tag);
+        virtual ~ErrorResponse() = default;
+        std::string getErrorName() const noexcept { return _ename; }
+        void setErrorName(const std::string& value) noexcept { _ename = value; }
+        virtual void encode(Message&) const;
+        virtual void decode(Message&);
+    private:
+        std::string _ename;
+};
 
 class VersionAction : public Action {
     public:
@@ -134,64 +169,6 @@ class VersionAction : public Action {
         std::string _version;
         uint16_t _msize;
 };
-class ErrorResponse : public Action {
-    public:
-        using Parent = Action;
-    public:
-        using Parent::Parent;
-        virtual ~ErrorResponse() = default;
-        void encode(Message&) const override;
-        void decode(Message&) override;
-        auto getName() const noexcept { return _ename; }
-        void setName(const std::string& value) noexcept { _ename = value; }
-    private:
-        std::string _ename;
-};
-
-class FlushAction : public Action {
-    public:
-        using Parent = Action;
-    public:
-        using Parent::Parent;
-        virtual ~FlushAction() = default;
-        void encode(Message&) const override;
-        void decode(Message&) override;
-        constexpr auto getOldTag() const noexcept { return _oldtag; }
-        void setOld(uint16_t value) noexcept { _oldtag = value; }
-    private:
-        uint16_t _oldtag;
-};
-
-template<Operation op>
-struct OperationToTypeBinding final {
-    OperationToTypeBinding() = delete;
-    ~OperationToTypeBinding() = delete;
-    OperationToTypeBinding(const OperationToTypeBinding&) = delete;
-    OperationToTypeBinding(OperationToTypeBinding&&) = delete;
-    OperationToTypeBinding& operator=(const OperationToTypeBinding&) = delete;
-    OperationToTypeBinding& operator=(OperationToTypeBinding&&) = delete;
-    static constexpr auto TargetOperation = op;
-};
-
-#define DefTypeBinding(op, type) \
-    template<> \
-    struct OperationToTypeBinding<Operation:: op > final { \
-    OperationToTypeBinding() = delete; \
-    ~OperationToTypeBinding() = delete; \
-    OperationToTypeBinding(const OperationToTypeBinding&) = delete; \
-    OperationToTypeBinding(OperationToTypeBinding&&) = delete; \
-    OperationToTypeBinding& operator=(const OperationToTypeBinding&) = delete; \
-    OperationToTypeBinding& operator=(OperationToTypeBinding&&) = delete; \
-    static constexpr auto TargetOperation = Operation:: op ; \
-    using BoundType = type ; \
-    }
-#define X(op, type) DefTypeBinding(op, type)
-X(TVersion, VersionAction);
-X(RVersion, VersionAction);
-#undef X
-#undef DefTypeBinding
-
-
 
 } // end namespace kzr
 
