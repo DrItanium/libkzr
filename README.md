@@ -20,5 +20,4 @@ The raw messages are converted into more palatable data structures.
 
 The logic layer is the layer which operates on the messages provided by the 
 message layer. A server listens for requests and responds with reciepts. A client
-sends requests to a server and listens for reciepts. The messages must be processe
-
+sends requests to a server and listens for reciepts. 
