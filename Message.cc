@@ -256,6 +256,20 @@ Stat::decode(Message& msg) {
         >> _muid;
 }
 
+AuthenticationRequest::AuthenticationRequest() : Parent(Operation::TAuth) { }
+AuthenticationRequest::AuthenticationRequest(uint16_t tag) : Parent(Operation::TAuth, tag) { }
+void
+AuthenticationRequest::encode(Message& msg) const {
+    Parent::encode(msg);
+    msg << _afid << _uname << _aname;
+}
+
+void
+AuthenticationRequest::decode(Message& msg) {
+    Parent::decode(msg);
+    msg >> _afid >> _uname >> _aname;
+}
+
 } // end namespace kzr
 kzr::Message&
 operator>>(kzr::Message& msg, std::set<std::string>& collec) {

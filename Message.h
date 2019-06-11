@@ -212,6 +212,30 @@ class VersionAction : public Action {
         uint16_t _msize;
 };
 
+class AuthenticationRequest : public Action {
+    public:
+        using Parent = Action;
+    public:
+        AuthenticationRequest();
+        explicit AuthenticationRequest(uint16_t tag);
+        virtual ~AuthenticationRequest() = default;
+        constexpr auto setAttachFid() const noexcept { return _afid; }
+        void setAttachFid(uint32_t value) noexcept { _afid = value; }
+#define X(title, name) \
+        auto get ## title () const noexcept { return  name ; } \
+        void set ## title (const std::string& value ) noexcept { name  = value ; }
+        X(UserName, _uname); 
+        X(AttachName, _aname);
+#undef X
+        void encode(Message&) const override;
+        void decode(Message&) override;
+    private:
+        uint32_t _afid;
+        std::string _uname;
+        std::string _aname;
+};
+
+
 } // end namespace kzr
 
 template<typename T>
