@@ -102,7 +102,33 @@ constexpr auto ConceptualOperationToROperation = Operation::RError;
         X(Stat, 124);
         X(WStat, 126);
 #undef X
-
+    constexpr ConceptualOperation convert(Operation op) noexcept {
+        switch (op) {
+#define X(name, _) \
+            case Operation::T ## name : \
+            case Operation::R ## name : \
+                 return ConceptualOperation:: name
+        X(Version, 100);
+        X(Auth, 102);
+        X(Attach, 104);
+        X(Error, 106);
+        X(Flush, 108);
+        X(Walk, 110);
+        X(Open, 112);
+        X(Create, 114);
+        X(Read, 116);
+        X(Write, 118);
+        X(Clunk, 120);
+        X(Remove, 122);
+        X(Stat, 124);
+        X(WStat, 126);
+#undef X
+            default:
+                return ConceptualOperation::Undefined;
+        }
+    }
+    Operation getTMessageForm(ConceptualOperation op);
+    Operation getRMessageForm(ConceptualOperation op);
 
     template<typename T>
     constexpr auto isEven(T value) noexcept {
