@@ -192,9 +192,6 @@ Message::read(std::string& str) {
     return read(str.data(), str.length());
 }
 
-ErrorResponse::ErrorResponse() : Parent(Operation::RError) { }
-ErrorResponse::ErrorResponse(uint16_t tag) : Parent(Operation::RError, tag) { }
-
 void 
 ErrorResponse::encode(Message& msg) const {
     Parent::encode(msg);
@@ -256,8 +253,6 @@ Stat::decode(Message& msg) {
         >> _muid;
 }
 
-AuthenticationRequest::AuthenticationRequest() : Parent(Operation::TAuth) { }
-AuthenticationRequest::AuthenticationRequest(uint16_t tag) : Parent(Operation::TAuth, tag) { }
 void
 AuthenticationRequest::encode(Message& msg) const {
     Parent::encode(msg);
@@ -268,6 +263,17 @@ void
 AuthenticationRequest::decode(Message& msg) {
     Parent::decode(msg);
     msg >> _afid >> _uname >> _aname;
+}
+
+void
+AuthenticationResponse::encode(Message& msg) const {
+    Parent::encode(msg);
+    msg << _aqid;
+}
+void
+AuthenticationResponse::decode(Message& msg) {
+    Parent::decode(msg);
+    msg >> _aqid;
 }
 
 } // end namespace kzr

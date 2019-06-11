@@ -168,7 +168,7 @@ class Action {
         virtual ~Action() = default;
         constexpr auto getTag() const noexcept { return _tag; }
         void setTag(uint16_t value) noexcept { _tag = value; }
-        void setOperation(Operation op) noexcept { _op = op; }
+        virtual void setOperation(Operation op) noexcept { _op = op; }
         virtual void encode(Message& msg) const;
         virtual void decode(Message& msg);
         constexpr auto getOperation() const noexcept { return _op; }
@@ -180,12 +180,23 @@ class Action {
         Operation _op;
         uint16_t _tag;
 };
-class ErrorResponse : public Action {
+template<Operation op>
+class FixedAction : public Action {
     public:
         using Parent = Action;
     public:
-        ErrorResponse();
-        explicit ErrorResponse(uint16_t tag);
+        FixedAction() : Parent(op) { }
+        explicit FixedAction(uint16_t tag) : Parent(op, tag) { }
+        virtual ~FixedAction() = default;
+        void setOperation(Operation) noexcept override { 
+            // do nothing since it is fixed!
+        }
+};
+class ErrorResponse : public FixedAction<Operation::RError> {
+    public:
+        using Parent = FixedAction<Operation::RError>;
+    public:
+        using Parent::Parent;
         virtual ~ErrorResponse() = default;
         std::string getErrorName() const noexcept { return _ename; }
         void setErrorName(const std::string& value) noexcept { _ename = value; }
@@ -212,12 +223,11 @@ class VersionAction : public Action {
         uint16_t _msize;
 };
 
-class AuthenticationRequest : public Action {
+class AuthenticationRequest : public FixedAction<Operation::TAuth> {
     public:
-        using Parent = Action;
+        using Parent = FixedAction<Operation::TAuth>;
     public:
-        AuthenticationRequest();
-        explicit AuthenticationRequest(uint16_t tag);
+        using Parent::Parent;
         virtual ~AuthenticationRequest() = default;
         constexpr auto setAttachFid() const noexcept { return _afid; }
         void setAttachFid(uint32_t value) noexcept { _afid = value; }
@@ -233,6 +243,21 @@ class AuthenticationRequest : public Action {
         uint32_t _afid;
         std::string _uname;
         std::string _aname;
+};
+
+class AuthenticationResponse : public FixedAction<Operation::RAuth> {
+    public:
+        using Parent = FixedAction<Operation::RAuth>;
+    public:
+        using Parent::Parent;
+        virtual ~AuthenticationResponse() = default;
+        void encode(Message&) const override;
+        void decode(Message&) override;
+        Qid& getQid() noexcept { return _aqid; }
+        const Qid& getQid() const noexcept { return _aqid; }
+        void setQid(const Qid& qid) { _aqid = qid; }
+    private:
+        Qid _aqid;
 };
 
 
