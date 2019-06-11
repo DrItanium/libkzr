@@ -192,9 +192,24 @@ class FixedAction : public Action {
             // do nothing since it is fixed!
         }
 };
-class ErrorResponse : public FixedAction<Operation::RError> {
+template<ConceptualOperation op>
+class FixedResponse : public FixedAction<ConceptualOperationToROperation<op>> {
     public:
-        using Parent = FixedAction<Operation::RError>;
+        using Parent = FixedAction<ConceptualOperationToROperation<op>>;
+    public:
+        using Parent::Parent;
+};
+template<ConceptualOperation op>
+class FixedRequest : public FixedAction<ConceptualOperationToTOperation<op>> {
+    public:
+        using Parent = FixedAction<ConceptualOperationToTOperation<op>>;
+    public:
+        using Parent::Parent;
+
+};
+class ErrorResponse : public FixedResponse<ConceptualOperation::Error> {
+    public:
+        using Parent = FixedResponse<ConceptualOperation::Error>;
     public:
         using Parent::Parent;
         virtual ~ErrorResponse() = default;
@@ -223,9 +238,9 @@ class VersionAction : public Action {
         uint16_t _msize;
 };
 
-class AuthenticationRequest : public FixedAction<Operation::TAuth> {
+class AuthenticationRequest : public FixedRequest<ConceptualOperation::Auth> {
     public:
-        using Parent = FixedAction<Operation::TAuth>;
+        using Parent = FixedRequest<ConceptualOperation::Auth>;
     public:
         using Parent::Parent;
         virtual ~AuthenticationRequest() = default;
@@ -245,9 +260,9 @@ class AuthenticationRequest : public FixedAction<Operation::TAuth> {
         std::string _aname;
 };
 
-class AuthenticationResponse : public FixedAction<Operation::RAuth> {
+class AuthenticationResponse : public FixedResponse<ConceptualOperation::Auth> {
     public:
-        using Parent = FixedAction<Operation::RAuth>;
+        using Parent = FixedResponse<ConceptualOperation::Auth>;
     public:
         using Parent::Parent;
         virtual ~AuthenticationResponse() = default;
