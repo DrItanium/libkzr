@@ -241,7 +241,19 @@ Stat::encode(Message& msg) const {
 
 void
 Stat::decode(Message& msg) {
-
+    uint16_t len;
+    msg >> len
+        >> _type
+        >> _dev
+        >> _qid
+        >> _mode
+        >> _atime
+        >> _mtime
+        >> _length
+        >> _name
+        >> _uid
+        >> _gid
+        >> _muid;
 }
 
 } // end namespace kzr
