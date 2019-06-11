@@ -53,6 +53,50 @@ namespace kzr {
 #undef X
     };
 
+    /**
+     * The operation type with the transmit/recieve information stripped away
+     */
+    enum class ConceptualOperation : uint8_t {
+        Undefined,
+#define X(kind, value) kind
+        X(Version, 100),
+        X(Auth, 102),
+        X(Attach, 104),
+        X(Error, 106),
+        X(Flush, 108),
+        X(Walk, 110),
+        X(Open, 112),
+        X(Create, 114),
+        X(Read, 116),
+        X(Write, 118),
+        X(Clunk, 120),
+        X(Remove, 122),
+        X(Stat, 124),
+        X(WStat, 126),
+#undef X
+    };
+template<Operation op>
+constexpr auto OperationToConceptualOperation = ConceptualOperation::Undefined;
+#define X(kind, value) \
+        template<> constexpr auto OperationToConceptualOperation< Operation::T ## kind > = ConceptualOperation:: kind ; \
+        template<> constexpr auto OperationToConceptualOperation< Operation::R ## kind > = ConceptualOperation:: kind
+        X(Version, 100);
+        X(Auth, 102);
+        X(Attach, 104);
+        X(Error, 106);
+        X(Flush, 108);
+        X(Walk, 110);
+        X(Open, 112);
+        X(Create, 114);
+        X(Read, 116);
+        X(Write, 118);
+        X(Clunk, 120);
+        X(Remove, 122);
+        X(Stat, 124);
+        X(WStat, 126);
+#undef X
+
+
     template<typename T>
     constexpr auto isEven(T value) noexcept {
         return (value & 1) == 0;
