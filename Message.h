@@ -187,7 +187,7 @@ class FixedAction : public Action {
     public:
         FixedAction() : Parent(op) { }
         explicit FixedAction(uint16_t tag) : Parent(op, tag) { }
-        virtual ~FixedAction() = default;
+        ~FixedAction() override = default;
         void setOperation(Operation) noexcept override { 
             // do nothing since it is fixed!
         }
@@ -198,6 +198,7 @@ class FixedResponse : public FixedAction<ConceptualOperationToROperation<op>> {
         using Parent = FixedAction<ConceptualOperationToROperation<op>>;
     public:
         using Parent::Parent;
+        ~FixedResponse() override = default;
 };
 template<ConceptualOperation op>
 class FixedRequest : public FixedAction<ConceptualOperationToTOperation<op>> {
@@ -205,6 +206,7 @@ class FixedRequest : public FixedAction<ConceptualOperationToTOperation<op>> {
         using Parent = FixedAction<ConceptualOperationToTOperation<op>>;
     public:
         using Parent::Parent;
+        ~FixedRequest() override = default;
 
 };
 class ErrorResponse : public FixedResponse<ConceptualOperation::Error> {
@@ -226,7 +228,7 @@ class VersionAction : public Action {
         using Parent = Action;
     public:
         using Parent::Parent;
-        virtual ~VersionAction() = default;
+        ~VersionAction() override = default;
         void encode(Message&) const override;
         void decode(Message&) override;
         auto getVersion() const noexcept { return _version; }
@@ -243,7 +245,7 @@ class AuthenticationRequest : public FixedRequest<ConceptualOperation::Auth> {
         using Parent = FixedRequest<ConceptualOperation::Auth>;
     public:
         using Parent::Parent;
-        virtual ~AuthenticationRequest() = default;
+        ~AuthenticationRequest() override = default;
         constexpr auto setAttachFid() const noexcept { return _afid; }
         void setAttachFid(uint32_t value) noexcept { _afid = value; }
 #define X(title, name) \
@@ -265,7 +267,7 @@ class AuthenticationResponse : public FixedResponse<ConceptualOperation::Auth> {
         using Parent = FixedResponse<ConceptualOperation::Auth>;
     public:
         using Parent::Parent;
-        virtual ~AuthenticationResponse() = default;
+        ~AuthenticationResponse() override = default;
         void encode(Message&) const override;
         void decode(Message&) override;
         Qid& getQid() noexcept { return _aqid; }
