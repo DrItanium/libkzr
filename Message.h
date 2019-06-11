@@ -115,6 +115,46 @@ class Qid  {
         uint64_t _path;
 };
 
+class Stat {
+    public:
+        Stat() = default;
+        void encode(Message&) const;
+        void decode(Message&);
+        Qid& getQid() noexcept { return _qid; }
+        const Qid& getQid() const noexcept { return _qid; }
+        void setQid(const Qid& qid) noexcept { _qid = qid; }
+#define X(name, field) \
+        auto get ## name () const noexcept { return field ; } \
+        void set ## name ( const std::string& value) noexcept { field = value ; }
+        X(FileName, _name);
+        X(Group, _gid);
+        X(Owner, _uid);
+        X(UserThatLastModified, _muid);
+#undef X
+#define X(name, field, type) \
+        constexpr auto get  ## name () const noexcept { return field ; } \
+        void set ## name (type value) noexcept  { field = value ; } 
+        X(Type, _type, uint16_t);
+        X(Device, _dev, uint32_t);
+        X(Permissions, _mode, uint32_t);
+        X(LastAccessTime, _atime, uint32_t);
+        X(LastModificationTime, _mtime, uint32_t);
+        X(Length, _length, uint64_t);
+#undef X
+    private:
+        uint16_t _type;
+        uint32_t _dev;
+        Qid _qid;
+        uint32_t _mode,
+                 _atime,
+                 _mtime;
+        uint64_t _length;
+        std::string _name,
+            _uid,
+            _gid,
+            _muid;
+};
+
 
 /**
  * Holds the arguments of a request by the client or a response by the server;

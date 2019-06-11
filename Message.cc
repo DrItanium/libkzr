@@ -218,6 +218,31 @@ Qid::decode(Message& msg) {
 
 Qid::Qid(uint8_t t, uint64_t path, uint32_t version) : _type(t), _version(version), _path(path) { }
 
+void
+Stat::encode(Message& msg) const {
+    // need to construct the inner message and then tack the stat onto the front
+    Message innerMessage;
+    innerMessage << _type 
+        << _dev 
+        << _qid 
+        << _mode
+        << _atime
+        << _mtime
+        << _length
+        << _name
+        << _uid
+        << _gid
+        << _muid;
+    auto innerString = innerMessage.str(); 
+    // we then just send this string to the outer message as it will get its length automatically
+    // computed as part of the encoding process
+    msg << innerString;
+}
+
+void
+Stat::decode(Message& msg) {
+
+}
 
 } // end namespace kzr
 kzr::Message&
