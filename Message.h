@@ -174,6 +174,7 @@ class Action {
         constexpr auto getOperation() const noexcept { return _op; }
         constexpr auto isRequest() const noexcept { return kzr::isRequest(_op); }
         constexpr auto isResponse() const noexcept { return kzr::isResponse(_op); }
+        constexpr auto getConceptualOperation() const noexcept { return kzr::convert(_op); }
     private:
         Operation _op;
         uint16_t _tag;
