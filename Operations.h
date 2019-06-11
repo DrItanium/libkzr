@@ -77,9 +77,16 @@ namespace kzr {
     };
 template<Operation op>
 constexpr auto OperationToConceptualOperation = ConceptualOperation::Undefined;
+
+template<ConceptualOperation op>
+constexpr auto ConceptualOperationToTOperation = Operation::RError;
+template<ConceptualOperation op>
+constexpr auto ConceptualOperationToROperation = Operation::RError;
 #define X(kind, value) \
         template<> constexpr auto OperationToConceptualOperation< Operation::T ## kind > = ConceptualOperation:: kind ; \
-        template<> constexpr auto OperationToConceptualOperation< Operation::R ## kind > = ConceptualOperation:: kind
+        template<> constexpr auto OperationToConceptualOperation< Operation::R ## kind > = ConceptualOperation:: kind ; \
+        template<> constexpr auto ConceptualOperationToTOperation < ConceptualOperation :: kind > = Operation::T ## kind ; \
+        template<> constexpr auto ConceptualOperationToROperation < ConceptualOperation :: kind > = Operation::R ## kind 
         X(Version, 100);
         X(Auth, 102);
         X(Attach, 104);
