@@ -301,7 +301,33 @@ class FlushRequest : public FixedRequest<ConceptualOperation::Flush> {
     private:
         uint16_t _oldtag;
 };
+
 using FlushResponse = FixedResponse<ConceptualOperation::Flush>;
+
+class AttachRequest : public FixedRequest<ConceptualOperation::Attach> {
+    public:
+        using Parent = FixedRequest<ConceptualOperation::Attach>;
+    public:
+        using Parent::Parent;
+        ~AttachRequest() override = default;
+        void encode(Message&) const override;
+        void decode(Message&) override;
+#define X(title, name) \
+        constexpr auto get ## title () const noexcept { return name ; } \
+        void set ## title (uint32_t value) noexcept { name = value ; } 
+        X(Fid, _fid);
+        X(AFid, _afid);
+#undef X
+#define X(title, name) \
+        auto get ## title () const noexcept { return  name ; } \
+        void set ## title (const std::string& value ) noexcept { name  = value ; }
+        X(UserName, _uname); 
+        X(AttachName, _aname);
+#undef X
+    private:
+        uint32_t _fid, _afid;
+        std::string _uname, _aname;
+};
 using ClunkResponse = FixedResponse<ConceptualOperation::Clunk>;
 using RemoveResponse = FixedResponse<ConceptualOperation::Remove>;
 using WStatResponse = FixedResponse<ConceptualOperation::WStat>;
