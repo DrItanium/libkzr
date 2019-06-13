@@ -32,7 +32,7 @@
 #include <ostream>
 #include <tuple>
 namespace kzr {
-    enum class Operation : uint8_t {
+    enum class [[nodiscard]] Operation : uint8_t {
 #define X(kind, value) \
         T ## kind = value, \
         R ## kind
@@ -56,7 +56,7 @@ namespace kzr {
     /**
      * The operation type with the transmit/recieve information stripped away
      */
-    enum class ConceptualOperation : uint8_t {
+    enum class [[nodiscard]] ConceptualOperation : uint8_t {
         Undefined,
 #define X(kind, value) kind
         X(Version, 100),

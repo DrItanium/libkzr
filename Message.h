@@ -85,7 +85,7 @@ class Message {
             data.decode(*this);
         }
         template<typename T>
-        T decode() {
+        [[nodiscard]] T decode() {
             T value;
             decode(value);
             return value;
@@ -100,7 +100,7 @@ class Message {
 #undef X
         Message& operator<<(const std::string& value);
         Message& operator>>(std::string& value);
-        auto length() const noexcept { return _storage.str().length(); }
+        [[nodiscard]] auto length() const noexcept { return _storage.str().length(); }
     private:
         std::stringstream _storage;
 };
@@ -108,7 +108,7 @@ class Message {
 /**
  * A unique identification for the given file being accessed
  */
-class Qid  {
+class [[nodiscard]] Qid  {
     public:
         Qid() = default;
         Qid(uint8_t type, uint64_t path, uint32_t version = 0);
@@ -126,7 +126,7 @@ class Qid  {
         uint64_t _path;
 };
 
-class Stat {
+class [[nodiscard]] Stat {
     public:
         Stat() = default;
         void encode(Message&) const;
@@ -177,16 +177,16 @@ class Action {
         explicit Action(Operation op);
         Action(Operation op, uint16_t tag);
         virtual ~Action() = default;
-        constexpr auto getTag() const noexcept { return _tag; }
+        [[nodiscard]] constexpr auto getTag() const noexcept { return _tag; }
         void setTag(uint16_t value) noexcept { _tag = value; }
         virtual void setOperation(Operation op) noexcept { _op = op; }
         virtual void encode(Message& msg) const;
         virtual void decode(Message& msg);
-        constexpr auto getOperation() const noexcept { return _op; }
-        constexpr auto isRequest() const noexcept { return kzr::isRequest(_op); }
-        constexpr auto isResponse() const noexcept { return kzr::isResponse(_op); }
-        constexpr auto getConceptualOperation() const noexcept { return kzr::convert(_op); }
-        constexpr auto isError() const noexcept { return getConceptualOperation() == ConceptualOperation::Error; }
+        [[nodiscard]] constexpr auto getOperation() const noexcept { return _op; }
+        [[nodiscard]] constexpr auto isRequest() const noexcept { return kzr::isRequest(_op); }
+        [[nodiscard]] constexpr auto isResponse() const noexcept { return kzr::isResponse(_op); }
+        [[nodiscard]] constexpr auto getConceptualOperation() const noexcept { return kzr::convert(_op); }
+        [[nodiscard]] constexpr auto isError() const noexcept { return getConceptualOperation() == ConceptualOperation::Error; }
     private:
         Operation _op;
         uint16_t _tag;
@@ -226,7 +226,7 @@ class ErrorResponse : public FixedResponse<ConceptualOperation::Error> {
     public:
         using Parent::Parent;
         virtual ~ErrorResponse() = default;
-        std::string getErrorName() const noexcept { return _ename; }
+        [[nodiscard]] std::string getErrorName() const noexcept { return _ename; }
         void setErrorName(const std::string& value) noexcept { _ename = value; }
         virtual void encode(Message&) const;
         virtual void decode(Message&);
@@ -242,8 +242,8 @@ class VersionAction : public Action {
         ~VersionAction() override = default;
         void encode(Message&) const override;
         void decode(Message&) override;
-        auto getVersion() const noexcept { return _version; }
-        constexpr auto getMsize() const noexcept { return _msize; }
+        [[nodiscard]] auto getVersion() const noexcept { return _version; }
+        [[nodiscard]] constexpr auto getMsize() const noexcept { return _msize; }
         void setMsize(uint16_t msize) noexcept { _msize = msize; }
         void setVersion(const std::string& value) { _version = value; }
     private:

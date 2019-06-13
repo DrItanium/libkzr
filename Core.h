@@ -30,22 +30,22 @@
 namespace kzr {
 
 template<typename T, typename R, T mask, T shift = static_cast<T>(0)>
-constexpr R decodeBits(T value) noexcept {
+[[nodiscard]] constexpr R decodeBits(T value) noexcept {
     return static_cast<R>((value & mask) >> shift);
 }
 
 template<typename T, typename R>
-constexpr R decodeBits(T value, T mask, T shift = static_cast<T>(0)) noexcept {
+[[nodiscard]] constexpr R decodeBits(T value, T mask, T shift = static_cast<T>(0)) noexcept {
     return static_cast<R>((value & mask) >> shift);
 }
 
 template<typename T, typename R, T mask, T shift = static_cast<T>(0)>
-constexpr T encodeBits(T value, R insert) noexcept {
+[[nodiscard]] constexpr T encodeBits(T value, R insert) noexcept {
     return static_cast<T>((value & (~mask)) | ((static_cast<T>(insert) << shift) & mask));
 }
 
 template<typename T, typename R>
-constexpr T encodeBits(T value, R insert, T mask, T shift = static_cast<T>(0)) noexcept {
+[[nodiscard]] constexpr T encodeBits(T value, R insert, T mask, T shift = static_cast<T>(0)) noexcept {
     return static_cast<T>((value & (~mask)) | ((static_cast<T>(insert) << shift) & mask));
 }
 
