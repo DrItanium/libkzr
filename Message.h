@@ -288,6 +288,24 @@ class AuthenticationResponse : public FixedResponse<ConceptualOperation::Auth> {
         Qid _aqid;
 };
 
+class FlushRequest : public FixedRequest<ConceptualOperation::Flush> {
+    public:
+        using Parent = FixedRequest<ConceptualOperation::Flush>;
+    public:
+        using Parent::Parent;
+        ~FlushRequest() override = default;
+        void encode(Message&) const override;
+        void decode(Message&) override;
+        constexpr auto getOldTag() const noexcept { return _oldtag; }
+        void setOldTag(uint16_t value) noexcept { _oldtag = value; }
+    private:
+        uint16_t _oldtag;
+};
+using FlushResponse = FixedResponse<ConceptualOperation::Flush>;
+using ClunkResponse = FixedResponse<ConceptualOperation::Clunk>;
+using RemoveResponse = FixedResponse<ConceptualOperation::Remove>;
+using WStatResponse = FixedResponse<ConceptualOperation::WStat>;
+
 
 } // end namespace kzr
 
