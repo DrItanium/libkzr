@@ -266,6 +266,17 @@ AuthenticationResponse::decode(Message& msg) {
     msg >> _aqid;
 }
 
+void
+FlushRequest::encode(Message& msg) const {
+    Parent::encode(msg);
+    msg << _oldtag;
+}
+void
+FlushRequest::decode(Message& msg) {
+    Parent::decode(msg);
+    msg >> _oldtag;
+}
+
 } // end namespace kzr
 kzr::Message&
 operator>>(kzr::Message& msg, std::set<std::string>& collec) {

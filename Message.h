@@ -328,6 +328,21 @@ class AttachRequest : public FixedRequest<ConceptualOperation::Attach> {
         uint32_t _fid, _afid;
         std::string _uname, _aname;
 };
+class AttachResponse : public FixedResponse<ConceptualOperation::Attach> {
+    
+    public:
+        using Parent = FixedResponse<ConceptualOperation::Attach>;
+    public:
+        using Parent::Parent;
+        ~AttachResponse() override = default;
+        void encode(Message&) const override;
+        void decode(Message&) override;
+        Qid& getQid() noexcept { return _aqid; }
+        const Qid& getQid() const noexcept { return _aqid; }
+        void setQid(const Qid& qid) { _aqid = qid; }
+    private:
+        Qid _aqid;
+};
 using ClunkResponse = FixedResponse<ConceptualOperation::Clunk>;
 using RemoveResponse = FixedResponse<ConceptualOperation::Remove>;
 using WStatResponse = FixedResponse<ConceptualOperation::WStat>;
