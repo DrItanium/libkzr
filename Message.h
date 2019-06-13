@@ -398,19 +398,32 @@ class OpenRequest : public FixedRequest<ConceptualOperation::Open>, public HasFi
         uint8_t _mode;
 };
 
-class OpenResponse : public FixedResponse < ConceptualOperation:: Open>, public HasQid {
+template<ConceptualOperation op>
+class OpenOrCreateResponse : public FixedResponse<op>, public HasQid {
     public:
-        using Parent = FixedResponse<ConceptualOperation::Open>; 
+        static_assert(op == ConceptualOperation::Create ||
+                      op == ConceptualOperation::Open, "Illegal OpenOrCreateResponse kind!");
+        using Parent = FixedResponse<op>;
     public:
         using Parent::Parent;
-        ~OpenResponse() override = default;
-        void encode(Message&) const override; 
-        void decode(Message&) override;
+        ~OpenOrCreateResponse() override = default;
+        void encode(Message& msg) const override {
+            Parent::encode(msg);
+            HasQid::encode(msg);
+            msg << _iounit;
+        }
+        void decode(Message& msg) override {
+            Parent::decode(msg);
+            HasQid::decode(msg);
+            msg >> _iounit;
+        }
         constexpr auto getIounit() const noexcept { return _iounit; }
         void setIounit(uint32_t v) noexcept { _iounit = v; }
     private:
         uint32_t _iounit;
+
 };
+using OpenResponse = OpenOrCreateResponse<ConceptualOperation::Open>;
 class CreateRequest : public FixedRequest<ConceptualOperation::Create>, public HasFid {
     public:
         using Parent = FixedRequest<ConceptualOperation:: Create>; 
@@ -431,19 +444,7 @@ class CreateRequest : public FixedRequest<ConceptualOperation::Create>, public H
         uint8_t _mode;
 };
 
-class CreateResponse : public FixedResponse < ConceptualOperation:: Create>, public HasQid {
-    public:
-        using Parent = FixedResponse<ConceptualOperation::Create>; 
-    public:
-        using Parent::Parent;
-        ~CreateResponse() override = default;
-        void encode(Message&) const override; 
-        void decode(Message&) override;
-        constexpr auto getIounit() const noexcept { return _iounit; }
-        void setIounit(uint32_t v) noexcept { _iounit = v; }
-    private:
-        uint32_t _iounit;
-};
+using CreateResponse = OpenOrCreateResponse<ConceptualOperation::Create>;
 
 template<ConceptualOperation op>
 class FidOnlyRequest : public FixedRequest<op>, public HasFid {
