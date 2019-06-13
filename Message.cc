@@ -299,6 +299,31 @@ AttachResponse::decode(Message& msg) {
     msg >> _qid;
 }
 
+void
+WalkRequest::encode(Message& msg) const {
+    Parent::encode(msg);
+    msg << _fid << _newfid << _wname;
+}
+
+void
+WalkRequest::decode(Message& msg) {
+    Parent::decode(msg);
+    msg >> _fid >> _newfid >> _wname;
+}
+
+void
+WalkResponse::encode(Message& msg) const {
+    Parent::encode(msg);
+    msg << _wqid;
+}
+
+void
+WalkResponse::decode(Message& msg) {
+    Parent::decode(msg);
+    msg >> _wqid;
+}
+
+
 } // end namespace kzr
 kzr::Message&
 operator>>(kzr::Message& msg, std::set<std::string>& collec) {

@@ -38,6 +38,7 @@
 #include <sstream>
 #include <tuple>
 #include "Operations.h"
+#include "Exception.h"
 
 namespace kzr {
 constexpr char version9pString[] = "9P";
@@ -343,9 +344,45 @@ class AttachResponse : public FixedResponse<ConceptualOperation::Attach> {
     private:
         Qid _qid;
 };
+
+class WalkRequest : public FixedRequest<ConceptualOperation::Walk> {
+    public:
+        using Parent = FixedRequest<ConceptualOperation:: Walk>; 
+    public: 
+        using Parent::Parent; 
+        ~ WalkRequest () override = default ; 
+        void encode(Message&) const override; 
+        void decode(Message&) override;
+        auto& getWname() noexcept { return _wname; }
+        const auto& getWname() const noexcept { return _wname; }
+        constexpr auto getFid() const noexcept { return _fid; }
+        void setFid(uint32_t value) noexcept { _fid = value; }
+        void setNewFid(uint32_t value) noexcept { _newfid = value; }
+        constexpr auto getNewFid() const noexcept { return _newfid; }
+    private:
+        uint32_t _fid, _newfid;
+        std::vector<std::string> _wname;
+};
+
+class WalkResponse : public FixedResponse<ConceptualOperation::Walk> {
+    public:
+        using Parent = FixedResponse<ConceptualOperation:: Walk>; 
+    public: 
+        using Parent::Parent; 
+        ~ WalkResponse () override = default ; 
+        void encode(Message&) const override; 
+        void decode(Message&) override;
+        auto& getWqid() noexcept { return _wqid; }
+        const auto& getWqid() const noexcept { return _wqid; }
+    private:
+        std::vector<Qid> _wqid;
+
+};
+
 using ClunkResponse = FixedResponse<ConceptualOperation::Clunk>;
 using RemoveResponse = FixedResponse<ConceptualOperation::Remove>;
 using WStatResponse = FixedResponse<ConceptualOperation::WStat>;
+
 
 
 } // end namespace kzr
@@ -366,6 +403,30 @@ kzr::Message& operator<<(kzr::Message&, const std::set<std::string>&);
 kzr::Message& operator>>(kzr::Message&, std::list<std::string>&);
 kzr::Message& operator>>(kzr::Message&, std::vector<std::string>&);
 kzr::Message& operator>>(kzr::Message&, std::set<std::string>&);
+
+template<typename T>
+kzr::Message& operator<<(kzr::Message& msg, const std::vector<T>& collec) {
+    if (uint16_t len = collec.size(); len != collec.size()) {
+        throw kzr::Exception("Attempted to encode a std::vector<T> of ", collec.size(), " elements when ", ((decltype(len))-1), " is the maximum allowed!");
+    } else {
+        msg << len;
+        for (const auto& c : collec) {
+            msg << c;
+        }
+        return msg;
+    }
+}
+
+template<typename T>
+kzr::Message& operator>>(kzr::Message& msg, std::vector<T>& collec) {
+    uint16_t len;
+    msg >> len;
+    for (auto i = 0; i < len; ++i) {
+        collec.emplace_back();
+        msg >> collec.back();
+    }
+    return msg;
+}
 
 template<typename T, size_t capacity>
 kzr::Message& operator<<(kzr::Message& msg, const std::array<T, capacity>& a) {
