@@ -27,7 +27,6 @@
  */
 #ifndef KZR_CORE_H__
 #define KZR_CORE_H__
-#include <cstdint>
 namespace kzr {
 
 template<typename T, typename R, T mask, T shift = static_cast<T>(0)>
@@ -49,8 +48,6 @@ template<typename T, typename R>
 constexpr T encodeBits(T value, R insert, T mask, T shift = static_cast<T>(0)) noexcept {
     return static_cast<T>((value & (~mask)) | ((static_cast<T>(insert) << shift) & mask));
 }
-
-
 
 } // end namespace kzr
 
