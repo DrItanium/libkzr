@@ -393,8 +393,24 @@ class OpenRequest : public FixedRequest<ConceptualOperation::Open> {
     private:
         uint32_t _fid;
         uint8_t _mode;
+};
 
-
+class OpenResponse : public FixedResponse < ConceptualOperation:: Open> {
+    public:
+        using Parent = FixedResponse<ConceptualOperation::Open>; 
+    public:
+        using Parent::Parent;
+        ~OpenResponse() override = default;
+        void encode(Message&) const override; 
+        void decode(Message&) override;
+        Qid& getQid() noexcept { return _qid; }
+        const Qid& getQid() const noexcept { return _qid; }
+        void setQid(const Qid& qid) { _qid = qid; }
+        constexpr auto getIounit() const noexcept { return _iounit; }
+        void setIounit(uint32_t v) noexcept { _iounit = v; }
+    private:
+        Qid _qid;
+        uint32_t _iounit;
 };
 
 using ClunkResponse = FixedResponse<ConceptualOperation::Clunk>;
