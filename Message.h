@@ -135,7 +135,7 @@ class [[nodiscard]] Stat {
         const Qid& getQid() const noexcept { return _qid; }
         void setQid(const Qid& qid) noexcept { _qid = qid; }
 #define X(name, field) \
-        auto get ## name () const noexcept { return field ; } \
+        [[nodiscard]] auto get ## name () const noexcept { return field ; } \
         void set ## name ( const std::string& value) noexcept { field = value ; }
         X(FileName, _name);
         X(Group, _gid);
@@ -143,7 +143,7 @@ class [[nodiscard]] Stat {
         X(UserThatLastModified, _muid);
 #undef X
 #define X(name, field, type) \
-        constexpr auto get  ## name () const noexcept { return field ; } \
+        [[nodiscard]] constexpr auto get  ## name () const noexcept { return field ; } \
         void set ## name (type value) noexcept  { field = value ; } 
         X(Type, _type, uint16_t);
         X(Device, _dev, uint32_t);
@@ -260,7 +260,7 @@ class AuthenticationRequest : public FixedRequest<ConceptualOperation::Auth> {
         constexpr auto setAttachFid() const noexcept { return _afid; }
         void setAttachFid(uint32_t value) noexcept { _afid = value; }
 #define X(title, name) \
-        auto get ## title () const noexcept { return  name ; } \
+        [[nodiscard]] auto get ## title () const noexcept { return  name ; } \
         void set ## title (const std::string& value ) noexcept { name  = value ; }
         X(UserName, _uname); 
         X(AttachName, _aname);
