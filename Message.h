@@ -167,6 +167,25 @@ class Stat {
             _muid;
 };
 
+class HasFid {
+    public:
+        void encode(Message& msg) const;
+        void decode(Message& msg);
+        constexpr auto getFid() const noexcept { return _fid; }
+        void setFid(uint32_t value) noexcept { _fid = value; }
+    private:
+        uint32_t _fid;
+};
+class HasQid {
+    public:
+        Qid& getQid() noexcept { return _aqid; }
+        const Qid& getQid() const noexcept { return _aqid; }
+        void setQid(const Qid& qid) { _aqid = qid; }
+        void encode(Message& msg) const;
+        void decode(Message& msg);
+    private:
+        Qid _aqid;
+};
 
 /**
  * Holds the arguments of a request by the client or a response by the server;
@@ -191,25 +210,6 @@ class Action {
     private:
         Operation _op;
         uint16_t _tag;
-};
-class HasFid {
-    public:
-        void encode(Message& msg) const;
-        void decode(Message& msg);
-        constexpr auto getFid() const noexcept { return _fid; }
-        void setFid(uint32_t value) noexcept { _fid = value; }
-    private:
-        uint32_t _fid;
-};
-class HasQid {
-    public:
-        Qid& getQid() noexcept { return _aqid; }
-        const Qid& getQid() const noexcept { return _aqid; }
-        void setQid(const Qid& qid) { _aqid = qid; }
-        void encode(Message& msg) const;
-        void decode(Message& msg);
-    private:
-        Qid _aqid;
 };
 template<Operation op>
 class FixedAction : public Action {
