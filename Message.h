@@ -447,15 +447,12 @@ class CreateRequest : public FixedRequest<ConceptualOperation::Create>, public H
 using CreateResponse = OpenOrCreateResponse<ConceptualOperation::Create>;
 
 template<ConceptualOperation op>
-class FidOnlyRequest : public FixedRequest<op>, public HasFid {
+class FidRequest : public FixedRequest<op>, public HasFid {
     public:
-        static_assert(op == ConceptualOperation::Clunk ||
-                      op == ConceptualOperation::Remove ||
-                      op == ConceptualOperation::Stat, "Illegal FidOnlyRequest kind!");
         using Parent = FixedRequest<op>;
     public:
         using Parent::Parent;
-        ~FidOnlyRequest() override = default;
+        ~FidRequest() override = default;
         void encode(Message& msg) const override {
             Parent::encode(msg);
             HasFid::encode(msg);
@@ -465,11 +462,55 @@ class FidOnlyRequest : public FixedRequest<op>, public HasFid {
             HasFid::decode(msg);
         }
 };
-using ClunkRequest = FidOnlyRequest<ConceptualOperation::Clunk>;
+
+class HasCount {
+    public:
+        constexpr auto getCount() const noexcept { return _count; }
+        void setCount(uint32_t v) noexcept { _count = v; }
+        void encode(Message& msg) const;
+        void decode(Message& msg);
+    private:
+        uint32_t _count;
+};
+class HasOffset {
+    public:
+        constexpr auto getCount() const noexcept { return _count; }
+        void setCount(uint64_t v) noexcept { _count = v; }
+        void encode(Message& msg) const;
+        void decode(Message& msg);
+    private:
+        uint64_t _count;
+};
+template<ConceptualOperation op>
+class ReadWriteRequest : public FidRequest<op>, public HasOffset {
+    public:
+        using Parent = FidRequest<op>;
+    public:
+        using Parent::Parent;
+        ~ReadWriteRequest() override = default;
+        void encode(Message& msg) const override {
+            Parent::encode(msg);
+            HasOffset::encode(msg);
+        }
+        void decode(Message& msg) override {
+            Parent::decode(msg);
+            HasOffset::decode(msg);
+        }
+};
+class ReadRequest : public ReadWriteRequest<ConceptualOperation::Read>, public HasCount {
+    public:
+        using Parent = ReadWriteRequest<ConceptualOperation::Read>;
+    public:
+        using Parent::Parent;
+        ~ReadRequest() override = default;
+        void encode(Message& msg) const override;
+        void decode(Message& msg) override;
+};
+using ClunkRequest = FidRequest<ConceptualOperation::Clunk>;
 using ClunkResponse = FixedResponse<ConceptualOperation::Clunk>;
-using RemoveRequest = FidOnlyRequest<ConceptualOperation::Remove>;
+using RemoveRequest = FidRequest<ConceptualOperation::Remove>;
 using RemoveResponse = FixedResponse<ConceptualOperation::Remove>;
-using StatRequest = FidOnlyRequest<ConceptualOperation::Stat>;
+using StatRequest = FidRequest<ConceptualOperation::Stat>;
 using WStatResponse = FixedResponse<ConceptualOperation::WStat>;
 
 
