@@ -445,8 +445,30 @@ class CreateResponse : public FixedResponse < ConceptualOperation:: Create>, pub
         uint32_t _iounit;
 };
 
+template<ConceptualOperation op>
+class FidOnlyRequest : public FixedRequest<op>, public HasFid {
+    public:
+        static_assert(op == ConceptualOperation::Clunk ||
+                      op == ConceptualOperation::Remove ||
+                      op == ConceptualOperation::Stat, "Illegal FidOnlyRequest kind!");
+        using Parent = FixedRequest<op>;
+    public:
+        using Parent::Parent;
+        ~FidOnlyRequest() override = default;
+        void encode(Message& msg) const override {
+            Parent::encode(msg);
+            HasFid::encode(msg);
+        }
+        void decode(Message& msg) override {
+            Parent::decode(msg);
+            HasFid::decode(msg);
+        }
+};
+using ClunkRequest = FidOnlyRequest<ConceptualOperation::Clunk>;
 using ClunkResponse = FixedResponse<ConceptualOperation::Clunk>;
+using RemoveRequest = FidOnlyRequest<ConceptualOperation::Remove>;
 using RemoveResponse = FixedResponse<ConceptualOperation::Remove>;
+using StatRequest = FidOnlyRequest<ConceptualOperation::Stat>;
 using WStatResponse = FixedResponse<ConceptualOperation::WStat>;
 
 
