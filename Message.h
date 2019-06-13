@@ -192,6 +192,15 @@ class Action {
         Operation _op;
         uint16_t _tag;
 };
+class HasFid {
+    public:
+        void encode(Message& msg) const { msg << _fid; }
+        void decode(Message& msg) { msg >> _fid; }
+        constexpr auto getFid() const noexcept { return _fid; }
+        void setFid(uint32_t value) noexcept { _fid = value; }
+    private:
+        uint32_t _fid;
+};
 template<Operation op>
 class FixedAction : public Action {
     public:
@@ -305,7 +314,7 @@ class FlushRequest : public FixedRequest<ConceptualOperation::Flush> {
 
 using FlushResponse = FixedResponse<ConceptualOperation::Flush>;
 
-class AttachRequest : public FixedRequest<ConceptualOperation::Attach> {
+class AttachRequest : public FixedRequest<ConceptualOperation::Attach>, public HasFid {
     public:
         using Parent = FixedRequest<ConceptualOperation::Attach>;
     public:
@@ -316,7 +325,6 @@ class AttachRequest : public FixedRequest<ConceptualOperation::Attach> {
 #define X(title, name) \
         constexpr auto get ## title () const noexcept { return name ; } \
         void set ## title (uint32_t value) noexcept { name = value ; } 
-        X(Fid, _fid);
         X(AFid, _afid);
 #undef X
 #define X(title, name) \
@@ -326,7 +334,7 @@ class AttachRequest : public FixedRequest<ConceptualOperation::Attach> {
         X(AttachName, _aname);
 #undef X
     private:
-        uint32_t _fid, _afid;
+        uint32_t _afid;
         std::string _uname, _aname;
 };
 class AttachResponse : public FixedResponse<ConceptualOperation::Attach> {
@@ -345,7 +353,7 @@ class AttachResponse : public FixedResponse<ConceptualOperation::Attach> {
         Qid _qid;
 };
 
-class WalkRequest : public FixedRequest<ConceptualOperation::Walk> {
+class WalkRequest : public FixedRequest<ConceptualOperation::Walk>, public HasFid {
     public:
         using Parent = FixedRequest<ConceptualOperation:: Walk>; 
     public: 
@@ -355,12 +363,10 @@ class WalkRequest : public FixedRequest<ConceptualOperation::Walk> {
         void decode(Message&) override;
         auto& getWname() noexcept { return _wname; }
         const auto& getWname() const noexcept { return _wname; }
-        constexpr auto getFid() const noexcept { return _fid; }
-        void setFid(uint32_t value) noexcept { _fid = value; }
         void setNewFid(uint32_t value) noexcept { _newfid = value; }
         constexpr auto getNewFid() const noexcept { return _newfid; }
     private:
-        uint32_t _fid, _newfid;
+        uint32_t _newfid;
         std::vector<std::string> _wname;
 };
 
@@ -378,7 +384,7 @@ class WalkResponse : public FixedResponse<ConceptualOperation::Walk> {
         std::vector<Qid> _wqid;
 };
 
-class OpenRequest : public FixedRequest<ConceptualOperation::Open> {
+class OpenRequest : public FixedRequest<ConceptualOperation::Open>, public HasFid {
     public:
         using Parent = FixedRequest<ConceptualOperation:: Open>; 
     public: 
@@ -386,12 +392,9 @@ class OpenRequest : public FixedRequest<ConceptualOperation::Open> {
         ~OpenRequest() override = default ; 
         void encode(Message&) const override; 
         void decode(Message&) override;
-        constexpr auto getFid() const noexcept { return _fid; }
         constexpr auto getMode() const noexcept { return _mode; }
-        void setFid(uint32_t v) noexcept { _fid = v; }
         void setMode(uint8_t v) noexcept { _mode = v; }
     private:
-        uint32_t _fid;
         uint8_t _mode;
 };
 
@@ -412,7 +415,7 @@ class OpenResponse : public FixedResponse < ConceptualOperation:: Open> {
         Qid _qid;
         uint32_t _iounit;
 };
-class CreateRequest : public FixedRequest<ConceptualOperation::Create> {
+class CreateRequest : public FixedRequest<ConceptualOperation::Create>, public HasFid {
     public:
         using Parent = FixedRequest<ConceptualOperation:: Create>; 
     public: 
@@ -420,8 +423,6 @@ class CreateRequest : public FixedRequest<ConceptualOperation::Create> {
         ~CreateRequest() override = default ; 
         void encode(Message&) const override; 
         void decode(Message&) override;
-        constexpr auto getFid() const noexcept { return _fid; }
-        void setFid(uint32_t v) noexcept { _fid = v; }
         constexpr auto getPermissions() const noexcept { return _perm; }
         void setPermissions(uint32_t v) noexcept { _perm = v; }
         constexpr auto getMode() const noexcept { return _mode; }
@@ -429,7 +430,6 @@ class CreateRequest : public FixedRequest<ConceptualOperation::Create> {
         auto getName() const noexcept { return  _name ; } 
         void setName(const std::string& value ) noexcept { _name  = value ; }
     private:
-        uint32_t _fid;
         std::string _name;
         uint32_t _perm;
         uint8_t _mode;

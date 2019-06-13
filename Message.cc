@@ -280,12 +280,14 @@ FlushRequest::decode(Message& msg) {
 void
 AttachRequest::encode(Message& msg) const {
     Parent::encode(msg);
-    msg << _fid << _afid << _uname << _aname;
+    HasFid::encode(msg);
+    msg << _afid << _uname << _aname;
 }
 void
 AttachRequest::decode(Message& msg) {
     Parent::decode(msg);
-    msg >> _fid >> _afid >> _uname >> _aname;
+    HasFid::decode(msg);
+    msg >> _afid >> _uname >> _aname;
 }
 
 void
@@ -302,13 +304,15 @@ AttachResponse::decode(Message& msg) {
 void
 WalkRequest::encode(Message& msg) const {
     Parent::encode(msg);
-    msg << _fid << _newfid << _wname;
+    HasFid::encode(msg);
+    msg << _newfid << _wname;
 }
 
 void
 WalkRequest::decode(Message& msg) {
     Parent::decode(msg);
-    msg >> _fid >> _newfid >> _wname;
+    HasFid::decode(msg);
+    msg >> _newfid >> _wname;
 }
 
 void
