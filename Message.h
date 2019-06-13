@@ -376,6 +376,24 @@ class WalkResponse : public FixedResponse<ConceptualOperation::Walk> {
         const auto& getWqid() const noexcept { return _wqid; }
     private:
         std::vector<Qid> _wqid;
+};
+
+class OpenRequest : public FixedRequest<ConceptualOperation::Open> {
+    public:
+        using Parent = FixedRequest<ConceptualOperation:: Open>; 
+    public: 
+        using Parent::Parent; 
+        ~OpenRequest() override = default ; 
+        void encode(Message&) const override; 
+        void decode(Message&) override;
+        constexpr auto getFid() const noexcept { return _fid; }
+        constexpr auto getMode() const noexcept { return _mode; }
+        void setFid(uint32_t v) noexcept { _fid = v; }
+        void setMode(uint8_t v) noexcept { _mode = v; }
+    private:
+        uint32_t _fid;
+        uint8_t _mode;
+
 
 };
 
