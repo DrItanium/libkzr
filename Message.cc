@@ -47,7 +47,7 @@ void
 Message::decode(uint16_t& out) {
     char temporaryStorage[2];
     _storage.read(temporaryStorage, 2);
-    out = build(temporaryStorage[0], temporaryStorage[1]);
+    out = build(uint8_t(temporaryStorage[0]), uint8_t(temporaryStorage[1]));
 }
 
 void
@@ -73,10 +73,7 @@ Message::encode(uint32_t value) {
 
 void
 Message::decode(uint64_t& out) {
-    uint32_t temporaryStorage[2];
-    decode(temporaryStorage[0]);
-    decode(temporaryStorage[1]);
-    out = build(temporaryStorage[0], temporaryStorage[1]);
+    out = build(decode<uint32_t>(), decode<uint32_t>());
 }
 
 void
@@ -87,8 +84,7 @@ Message::encode(uint64_t value) {
 
 void
 Message::decode(std::string& data) {
-    uint16_t len;
-    decode(len);
+    auto len = decode<uint16_t>();
     data.reserve(len);
     _storage.read(data.data(), len);
 }

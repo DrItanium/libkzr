@@ -82,6 +82,12 @@ class Message {
         void decode(T& data) {
             data.decode(*this);
         }
+        template<typename T>
+        T decode() {
+            T value;
+            decode(value);
+            return value;
+        }
 #define X(type) \
         Message& operator<<(type data); \
         Message& operator>>(type& data)
