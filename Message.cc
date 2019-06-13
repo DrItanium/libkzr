@@ -65,10 +65,8 @@ Message::decode(uint32_t& out) {
 
 void
 Message::encode(uint32_t value) {
-    _storage.put(uint8_t(value));
-    _storage.put(uint8_t(value >> 8));
-    _storage.put(uint8_t(value >> 16));
-    _storage.put(uint8_t(value >> 24));
+    encode(uint16_t(value));
+    encode(uint16_t(value >> 16));
 }
 
 void
