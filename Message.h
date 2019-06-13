@@ -412,6 +412,46 @@ class OpenResponse : public FixedResponse < ConceptualOperation:: Open> {
         Qid _qid;
         uint32_t _iounit;
 };
+class CreateRequest : public FixedRequest<ConceptualOperation::Create> {
+    public:
+        using Parent = FixedRequest<ConceptualOperation:: Create>; 
+    public: 
+        using Parent::Parent; 
+        ~CreateRequest() override = default ; 
+        void encode(Message&) const override; 
+        void decode(Message&) override;
+        constexpr auto getFid() const noexcept { return _fid; }
+        void setFid(uint32_t v) noexcept { _fid = v; }
+        constexpr auto getPermissions() const noexcept { return _perm; }
+        void setPermissions(uint32_t v) noexcept { _perm = v; }
+        constexpr auto getMode() const noexcept { return _mode; }
+        void setMode(uint8_t v) noexcept { _mode = v; }
+        auto getName() const noexcept { return  _name ; } 
+        void setName(const std::string& value ) noexcept { _name  = value ; }
+    private:
+        uint32_t _fid;
+        std::string _name;
+        uint32_t _perm;
+        uint8_t _mode;
+};
+
+class CreateResponse : public FixedResponse < ConceptualOperation:: Create> {
+    public:
+        using Parent = FixedResponse<ConceptualOperation::Create>; 
+    public:
+        using Parent::Parent;
+        ~CreateResponse() override = default;
+        void encode(Message&) const override; 
+        void decode(Message&) override;
+        Qid& getQid() noexcept { return _qid; }
+        const Qid& getQid() const noexcept { return _qid; }
+        void setQid(const Qid& qid) { _qid = qid; }
+        constexpr auto getIounit() const noexcept { return _iounit; }
+        void setIounit(uint32_t v) noexcept { _iounit = v; }
+    private:
+        Qid _qid;
+        uint32_t _iounit;
+};
 
 using ClunkResponse = FixedResponse<ConceptualOperation::Clunk>;
 using RemoveResponse = FixedResponse<ConceptualOperation::Remove>;
