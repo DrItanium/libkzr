@@ -258,13 +258,21 @@ AuthenticationRequest::decode(Message& msg) {
 void
 AuthenticationResponse::encode(Message& msg) const {
     Parent::encode(msg);
-    msg << _aqid;
+    HasQid::encode(msg);
 }
 void
 AuthenticationResponse::decode(Message& msg) {
     Parent::decode(msg);
-    msg >> _aqid;
+    HasQid::decode(msg);
 }
+void 
+HasQid::encode(Message& msg) const { msg << _aqid; }
+void 
+HasQid::decode(Message& msg) { msg >> _aqid; }
+void 
+HasFid::encode(Message& msg) const { msg << _fid; }
+void 
+HasFid::decode(Message& msg) { msg >> _fid; }
 
 void
 FlushRequest::encode(Message& msg) const {
@@ -293,12 +301,12 @@ AttachRequest::decode(Message& msg) {
 void
 AttachResponse::encode(Message& msg) const {
     Parent::encode(msg);
-    msg << _qid;
+    HasQid::encode(msg);
 }
 void
 AttachResponse::decode(Message& msg) {
     Parent::decode(msg);
-    msg >> _qid;
+    HasQid::decode(msg);
 }
 
 void

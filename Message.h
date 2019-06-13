@@ -194,12 +194,22 @@ class Action {
 };
 class HasFid {
     public:
-        void encode(Message& msg) const { msg << _fid; }
-        void decode(Message& msg) { msg >> _fid; }
+        void encode(Message& msg) const;
+        void decode(Message& msg);
         constexpr auto getFid() const noexcept { return _fid; }
         void setFid(uint32_t value) noexcept { _fid = value; }
     private:
         uint32_t _fid;
+};
+class HasQid {
+    public:
+        Qid& getQid() noexcept { return _aqid; }
+        const Qid& getQid() const noexcept { return _aqid; }
+        void setQid(const Qid& qid) { _aqid = qid; }
+        void encode(Message& msg) const;
+        void decode(Message& msg);
+    private:
+        Qid _aqid;
 };
 template<Operation op>
 class FixedAction : public Action {
@@ -283,7 +293,7 @@ class AuthenticationRequest : public FixedRequest<ConceptualOperation::Auth> {
         std::string _aname;
 };
 
-class AuthenticationResponse : public FixedResponse<ConceptualOperation::Auth> {
+class AuthenticationResponse : public FixedResponse<ConceptualOperation::Auth>, public HasQid {
     public:
         using Parent = FixedResponse<ConceptualOperation::Auth>;
     public:
@@ -291,11 +301,6 @@ class AuthenticationResponse : public FixedResponse<ConceptualOperation::Auth> {
         ~AuthenticationResponse() override = default;
         void encode(Message&) const override;
         void decode(Message&) override;
-        Qid& getQid() noexcept { return _aqid; }
-        const Qid& getQid() const noexcept { return _aqid; }
-        void setQid(const Qid& qid) { _aqid = qid; }
-    private:
-        Qid _aqid;
 };
 
 class FlushRequest : public FixedRequest<ConceptualOperation::Flush> {
@@ -337,7 +342,7 @@ class AttachRequest : public FixedRequest<ConceptualOperation::Attach>, public H
         uint32_t _afid;
         std::string _uname, _aname;
 };
-class AttachResponse : public FixedResponse<ConceptualOperation::Attach> {
+class AttachResponse : public FixedResponse<ConceptualOperation::Attach>, public HasQid {
     
     public:
         using Parent = FixedResponse<ConceptualOperation::Attach>;
@@ -346,11 +351,6 @@ class AttachResponse : public FixedResponse<ConceptualOperation::Attach> {
         ~AttachResponse() override = default;
         void encode(Message&) const override;
         void decode(Message&) override;
-        Qid& getQid() noexcept { return _qid; }
-        const Qid& getQid() const noexcept { return _qid; }
-        void setQid(const Qid& qid) { _qid = qid; }
-    private:
-        Qid _qid;
 };
 
 class WalkRequest : public FixedRequest<ConceptualOperation::Walk>, public HasFid {
@@ -398,7 +398,7 @@ class OpenRequest : public FixedRequest<ConceptualOperation::Open>, public HasFi
         uint8_t _mode;
 };
 
-class OpenResponse : public FixedResponse < ConceptualOperation:: Open> {
+class OpenResponse : public FixedResponse < ConceptualOperation:: Open>, public HasQid {
     public:
         using Parent = FixedResponse<ConceptualOperation::Open>; 
     public:
@@ -406,13 +406,9 @@ class OpenResponse : public FixedResponse < ConceptualOperation:: Open> {
         ~OpenResponse() override = default;
         void encode(Message&) const override; 
         void decode(Message&) override;
-        Qid& getQid() noexcept { return _qid; }
-        const Qid& getQid() const noexcept { return _qid; }
-        void setQid(const Qid& qid) { _qid = qid; }
         constexpr auto getIounit() const noexcept { return _iounit; }
         void setIounit(uint32_t v) noexcept { _iounit = v; }
     private:
-        Qid _qid;
         uint32_t _iounit;
 };
 class CreateRequest : public FixedRequest<ConceptualOperation::Create>, public HasFid {
@@ -435,7 +431,7 @@ class CreateRequest : public FixedRequest<ConceptualOperation::Create>, public H
         uint8_t _mode;
 };
 
-class CreateResponse : public FixedResponse < ConceptualOperation:: Create> {
+class CreateResponse : public FixedResponse < ConceptualOperation:: Create>, public HasQid {
     public:
         using Parent = FixedResponse<ConceptualOperation::Create>; 
     public:
@@ -443,13 +439,9 @@ class CreateResponse : public FixedResponse < ConceptualOperation:: Create> {
         ~CreateResponse() override = default;
         void encode(Message&) const override; 
         void decode(Message&) override;
-        Qid& getQid() noexcept { return _qid; }
-        const Qid& getQid() const noexcept { return _qid; }
-        void setQid(const Qid& qid) { _qid = qid; }
         constexpr auto getIounit() const noexcept { return _iounit; }
         void setIounit(uint32_t v) noexcept { _iounit = v; }
     private:
-        Qid _qid;
         uint32_t _iounit;
 };
 
