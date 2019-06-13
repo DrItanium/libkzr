@@ -277,6 +277,28 @@ FlushRequest::decode(Message& msg) {
     msg >> _oldtag;
 }
 
+void
+AttachRequest::encode(Message& msg) const {
+    Parent::encode(msg);
+    msg << _fid << _afid << _uname << _aname;
+}
+void
+AttachRequest::decode(Message& msg) {
+    Parent::decode(msg);
+    msg >> _fid >> _afid >> _uname >> _aname;
+}
+
+void
+AttachResponse::encode(Message& msg) const {
+    Parent::encode(msg);
+    msg << _qid;
+}
+void
+AttachResponse::decode(Message& msg) {
+    Parent::decode(msg);
+    msg >> _qid;
+}
+
 } // end namespace kzr
 kzr::Message&
 operator>>(kzr::Message& msg, std::set<std::string>& collec) {
