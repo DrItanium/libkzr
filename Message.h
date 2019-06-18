@@ -481,6 +481,16 @@ class HasOffset {
     private:
         uint64_t _offset;
 };
+class HasDataStorage {
+    public:
+        constexpr auto size() const noexcept { return _data.size(); }
+        auto& getData() noexcept { return _data; }
+        const auto& getData() const noexcept { return _data; }
+        void encode(Message& msg) const;
+        void decode(Message& msg);
+    private:
+        std::vector<uint8_t> _data;
+}
 template<ConceptualOperation op>
 class ReadWriteRequest : public FidRequest<op>, public HasOffset {
     public:
@@ -507,7 +517,7 @@ class ReadRequest : public ReadWriteRequest<ConceptualOperation::Read>, public H
         void decode(Message& msg) override;
 };
 
-class ReadResponse : public FixedResponse<ConceptualOperation::Read> {
+class ReadResponse : public FixedResponse<ConceptualOperation::Read>, public HasDataStorage {
     public:
         using Parent = FixedResponse<ConceptualOperation::Read>;
     public:
@@ -515,10 +525,26 @@ class ReadResponse : public FixedResponse<ConceptualOperation::Read> {
         ~ReadResponse() override = default;
         void encode(Message&) const override;
         void decode(Message&) override;
-        auto& getStorage() noexcept { return _storage; }
-        const auto& getStorage() const noexcept { return _storage; }
-    private:
-        std::vector<uint8_t> _storage;
+};
+
+class WriteRequest : public ReadWriteRequest<ConceptualOperation::Write>, public HasDataStorage {
+    public:
+        using Parent = ReadWriteRequest<ConceptualOperation::Write>;
+    public:
+        using Parent::Parent;
+        ~WriteRequest() override = default;
+        void encode(Message&) const override;
+        void decode(Message&) override;
+};
+
+class WriteResponse : public FixedResponse<ConceptualOperation::Write>, public HasCount {
+    public:
+        using Parent = FixedResponse<ConceptualOperation::Write>;
+    public:
+        using Parent::Parent;
+        ~WriteResponse() override = default;
+        void encode(Message&) const override;
+        void decode(Message&) override;
 };
 
 using ClunkRequest = FidRequest<ConceptualOperation::Clunk>;
