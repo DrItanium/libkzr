@@ -474,12 +474,12 @@ class HasCount {
 };
 class HasOffset {
     public:
-        constexpr auto getCount() const noexcept { return _count; }
-        void setCount(uint64_t v) noexcept { _count = v; }
+        constexpr auto getOffset() const noexcept { return _offset; }
+        void setOffset(uint64_t v) noexcept { _offset = v; }
         void encode(Message& msg) const;
         void decode(Message& msg);
     private:
-        uint64_t _count;
+        uint64_t _offset;
 };
 template<ConceptualOperation op>
 class ReadWriteRequest : public FidRequest<op>, public HasOffset {
@@ -506,6 +506,21 @@ class ReadRequest : public ReadWriteRequest<ConceptualOperation::Read>, public H
         void encode(Message& msg) const override;
         void decode(Message& msg) override;
 };
+
+class ReadResponse : public FixedResponse<ConceptualOperation::Read> {
+    public:
+        using Parent = FixedResponse<ConceptualOperation::Read>;
+    public:
+        using Parent::Parent;
+        ~ReadResponse() override = default;
+        void encode(Message&) const override;
+        void decode(Message&) override;
+        auto& getStorage() noexcept { return _storage; }
+        const auto& getStorage() const noexcept { return _storage; }
+    private:
+        std::vector<uint8_t> _storage;
+};
+
 using ClunkRequest = FidRequest<ConceptualOperation::Clunk>;
 using ClunkResponse = FixedResponse<ConceptualOperation::Clunk>;
 using RemoveRequest = FidRequest<ConceptualOperation::Remove>;
