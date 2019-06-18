@@ -483,14 +483,14 @@ class HasOffset {
 };
 class HasDataStorage {
     public:
-        constexpr auto size() const noexcept { return _data.size(); }
+        auto size() const noexcept { return _data.size(); }
         auto& getData() noexcept { return _data; }
         const auto& getData() const noexcept { return _data; }
         void encode(Message& msg) const;
         void decode(Message& msg);
     private:
         std::vector<uint8_t> _data;
-}
+};
 template<ConceptualOperation op>
 class ReadWriteRequest : public FidRequest<op>, public HasOffset {
     public:
