@@ -564,9 +564,32 @@ using ClunkResponse = FixedResponse<ConceptualOperation::Clunk>;
 using RemoveRequest = FidRequest<ConceptualOperation::Remove>;
 using RemoveResponse = FixedResponse<ConceptualOperation::Remove>;
 using StatRequest = FidRequest<ConceptualOperation::Stat>;
+class StatResponse : public FixedResponse<ConceptualOperation::Stat>, public HasDataStorage {
+        // NOTE: we have to encode 16-bit length in this case so encode/decode is special
+    public:
+        // Rstat
+        using Parent = FixedResponse<ConceptualOperation::Stat>;
+    public:
+        using Parent::Parent;
+        ~StatResponse() override = default;
+        void encode(Message&) const override;
+        void decode(Message&) override;
+};
+class WStatRequest : public FixedRequest<ConceptualOperation::WStat>, public HasFid {
+    public:
+        using Parent = FixedRequest<ConceptualOperation::WStat>;
+    public:
+        using Parent::Parent;
+        ~WStatRequest() override = default;
+        void encode(Message&) const override;
+        void decode(Message&) override;
+        Stat& getStat() noexcept { return _stat; }
+        const Stat& getStat() const noexcept { return _stat; }
+        void setStat(const Stat& stat) noexcept { _stat = stat; }
+    private:
+        Stat _stat;
+};
 using WStatResponse = FixedResponse<ConceptualOperation::WStat>;
-
-
 
 } // end namespace kzr
 
