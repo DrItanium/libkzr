@@ -192,13 +192,11 @@ class HasFid {
  */
 class ActionHeader {
     public:
-        ActionHeader() = default;
         explicit ActionHeader(Operation op);
         ActionHeader(Operation op, uint16_t tag);
         virtual ~ActionHeader() = default;
         constexpr auto getTag() const noexcept { return _tag; }
         void setTag(uint16_t value) noexcept { _tag = value; }
-        virtual void setOperation(Operation op) noexcept { _op = op; }
         virtual void encode(Message& msg) const;
         virtual void decode(Message& msg);
         constexpr auto getOperation() const noexcept { return _op; }
@@ -218,9 +216,6 @@ class Action : public ActionHeader {
         Action() : Parent(op) { }
         explicit Action(uint16_t tag) : Parent(op, tag) { }
         ~Action() override = default;
-        void setOperation(Operation) noexcept override { 
-            // do nothing since it is fixed!
-        }
 };
 template<ConceptualOperation op>
 class FixedResponse : public Action<getRMessageForm(op)> {
