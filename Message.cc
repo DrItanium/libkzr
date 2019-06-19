@@ -353,6 +353,15 @@ WalkResponse::decode(Message& msg) {
     msg >> _wqid;
 }
 
+std::optional<uint8_t>
+Message::peek() noexcept {
+    if (auto result = _storage.peek(); result != _storage.eof()) {
+        return std::optional<uint8_t>(uint8_t(result));
+    } else {
+        return std::nullopt;
+    }
+}
+
 
 } // end namespace kzr
 kzr::Message&

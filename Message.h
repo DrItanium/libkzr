@@ -78,6 +78,7 @@ class Message {
         void decode(uint32_t& value);
         void decode(uint64_t& value);
         void decode(std::string& value);
+        std::optional<uint8_t> peek() noexcept;
         template<typename T>
         void encode(const T& data) {
             data.encode(*this);
