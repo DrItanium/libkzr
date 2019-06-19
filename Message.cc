@@ -610,7 +610,7 @@ operator>>(kzr::Message& msg, kzr::Request& request) {
                  request.emplace<kzr::BoundRequestType<kzr::ConceptualOperation:: name>>(); \
                  msg.decode(std::get<kzr::BoundRequestType<kzr::ConceptualOperation:: name>>(request)); \
                 break ;
-            PROTOCOL_KINDS
+            KZR_PROTOCOL_KINDS
 #undef X
             default:
                 throw kzr::Exception("Illegal type found!");
@@ -631,7 +631,7 @@ operator>>(kzr::Message& msg, kzr::Response& request) {
                  request.emplace<kzr::BoundResponseType<kzr::ConceptualOperation:: name>>(); \
                  msg.decode(std::get<kzr::BoundResponseType<kzr::ConceptualOperation:: name>>(request)); \
                 break;
-            PROTOCOL_KINDS
+            KZR_PROTOCOL_KINDS
 #undef X
             default:
                 throw kzr::Exception("Illegal type found!");

@@ -644,14 +644,14 @@ BindRequestResponseToTypes(WStat, WStatRequest, WStatResponse);
 using Response = std::variant<
 UndefinedResponse
 #define X(name, _) ,BoundResponseType<ConceptualOperation:: name >
-PROTOCOL_KINDS
+KZR_PROTOCOL_KINDS
 #undef X
     >;
 
 using Request = std::variant<
 UndefinedRequest
 #define X(name, _) , BoundRequestType<ConceptualOperation:: name >
-PROTOCOL_KINDS
+KZR_PROTOCOL_KINDS
 #undef X
     >;
 

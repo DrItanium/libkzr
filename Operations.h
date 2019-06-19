@@ -29,7 +29,7 @@
 #define KZR_OPERATIONS_H__
 #include <cstdint>
 namespace kzr {
-#define PROTOCOL_KINDS \
+#define KZR_PROTOCOL_KINDS \
 X(Version, 100) \
 X(Auth, 102) \
 X(Attach, 104) \
@@ -48,7 +48,7 @@ X(WStat, 126)
 #define X(kind, value) \
         T ## kind = value, \
         R ## kind,
-        PROTOCOL_KINDS
+        KZR_PROTOCOL_KINDS
 #undef X
         TBad = 0xFE, // these are unused codes so we can just reuse them here
         RBad = 0xFF,
@@ -60,7 +60,7 @@ X(WStat, 126)
     enum class ConceptualOperation : uint8_t {
         Undefined,
 #define X(kind, value) kind,
-PROTOCOL_KINDS
+KZR_PROTOCOL_KINDS
 #undef X
     };
     constexpr ConceptualOperation convert(Operation op) noexcept {
@@ -69,7 +69,7 @@ PROTOCOL_KINDS
             case Operation::T ## name : \
             case Operation::R ## name : \
                  return ConceptualOperation:: name;
-PROTOCOL_KINDS
+KZR_PROTOCOL_KINDS
 #undef X
             default:
                 return ConceptualOperation::Undefined;
@@ -80,7 +80,7 @@ PROTOCOL_KINDS
 #define X(name, _) \
             case ConceptualOperation:: name: \
             return Operation::T ## name ;
-PROTOCOL_KINDS
+KZR_PROTOCOL_KINDS
 #undef X
             default:
                 return Operation::TBad;
@@ -91,7 +91,7 @@ PROTOCOL_KINDS
 #define X(name, _) \
             case ConceptualOperation:: name: \
             return Operation::R ## name;
-            PROTOCOL_KINDS
+            KZR_PROTOCOL_KINDS
 #undef X
             default:
                 return Operation::RBad;
@@ -162,7 +162,7 @@ PROTOCOL_KINDS
             // must be a transmit message
             switch (op) {
 #define X(kind, _) case Operation:: T ## kind : return Operation:: R ## kind;
-                PROTOCOL_KINDS
+                KZR_PROTOCOL_KINDS
 #undef X
                 default: 
                     return Operation::RBad;
