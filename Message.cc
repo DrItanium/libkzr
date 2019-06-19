@@ -520,30 +520,6 @@ HasOffset::decode(Message& msg) {
 
 } // end namespace kzr
 
-kzr::Message&
-operator>>(kzr::Message& msg, std::vector<std::string>& collec) {
-    uint16_t len;
-    msg >> len;
-    for (auto i = 0; i < len; ++i) {
-        std::string temporary;
-        msg >> temporary;
-        collec.emplace_back(temporary);
-    }
-    return msg;
-}
-kzr::Message&
-operator<<(kzr::Message& msg, const std::vector<std::string>& collec) {
-    if (uint16_t len = collec.size(); len != collec.size()) {
-        throw kzr::Exception("Attempted to encode a std::vector<std::string> of ", collec.size(), " elements when ", ((decltype(len))-1), " is the maximum allowed!");
-    } else {
-        msg << len;
-        for (const auto& c : collec) {
-            msg << c;
-        }
-        return msg;
-    }
-}
-
 kzr::Message& 
 operator<<(kzr::Message& msg, const kzr::Request& request) {
     std::visit([&msg](auto&& value) { msg << value; }, request);
