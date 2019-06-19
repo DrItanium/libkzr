@@ -251,7 +251,9 @@ class ErrorResponse : public FixedResponse<ConceptualOperation::Error> {
     private:
         std::string _ename;
 };
-BindResponseToType(Error, ErrorResponse);
+// Requesting errors does not make sense but this is here for regularity
+using ErrorRequest = FixedRequest<ConceptualOperation::Error>;
+BindRequestResponseToTypes(Error, ErrorRequest, ErrorResponse);
 class VersionBody {
     public:
         void encode(Message&) const;
@@ -607,6 +609,44 @@ class WStatRequest : public FixedRequest<ConceptualOperation::WStat>, public Has
 using WStatResponse = FixedResponse<ConceptualOperation::WStat>;
 
 BindRequestResponseToTypes(WStat, WStatRequest, WStatResponse);
+
+using Response = std::variant<
+#define X(name, _) BoundResponseType<ConceptualOperation:: name > 
+            X(Version, 100),
+            X(Auth, 102),
+            X(Attach, 104),
+            X(Error, 106),
+            X(Flush, 108),
+            X(Walk, 110),
+            X(Open, 112),
+            X(Create, 114),
+            X(Read, 116),
+            X(Write, 118),
+            X(Clunk, 120),
+            X(Remove, 122),
+            X(Stat, 124),
+            X(WStat, 126)
+#undef X
+    >;
+
+using Request = std::variant<
+#define X(name, _) BoundRequestType<ConceptualOperation:: name > 
+            X(Version, 100),
+            X(Auth, 102),
+            X(Attach, 104),
+            X(Error, 106),
+            X(Flush, 108),
+            X(Walk, 110),
+            X(Open, 112),
+            X(Create, 114),
+            X(Read, 116),
+            X(Write, 118),
+            X(Clunk, 120),
+            X(Remove, 122),
+            X(Stat, 124),
+            X(WStat, 126)
+#undef X
+    >;
 
 
 } // end namespace kzr
