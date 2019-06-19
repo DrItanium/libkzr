@@ -670,12 +670,8 @@ kzr::Message& operator>>(kzr::Message& msg, T& value) {
     msg.decode<T>(value);
     return msg;
 }
-kzr::Message& operator<<(kzr::Message&, const std::list<std::string>&);
 kzr::Message& operator<<(kzr::Message&, const std::vector<std::string>&);
-kzr::Message& operator<<(kzr::Message&, const std::set<std::string>&);
-kzr::Message& operator>>(kzr::Message&, std::list<std::string>&);
 kzr::Message& operator>>(kzr::Message&, std::vector<std::string>&);
-kzr::Message& operator>>(kzr::Message&, std::set<std::string>&);
 
 template<typename T>
 kzr::Message& operator<<(kzr::Message& msg, const std::vector<T>& collec) {
