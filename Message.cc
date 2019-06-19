@@ -487,6 +487,36 @@ HasDataStorage::decode(Message& msg) {
     }
 }
 
+void
+HasName::encode(Message& msg) const {
+    msg << _name; 
+}
+
+void
+HasName::decode(Message& msg) {
+    msg >> _name; 
+}
+
+void
+HasCount::encode(Message& msg) const {
+    msg << _count; 
+}
+
+void
+HasCount::decode(Message& msg) {
+    msg >> _count; 
+}
+
+void
+HasOffset::encode(Message& msg) const {
+    msg << _offset; 
+}
+
+void
+HasOffset::decode(Message& msg) {
+    msg >> _offset; 
+}
+
 
 } // end namespace kzr
 kzr::Message&
