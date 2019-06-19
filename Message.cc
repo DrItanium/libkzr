@@ -478,3 +478,37 @@ operator>>(kzr::Message& msg, kzr::Request& request) {
         throw kzr::Exception("Cannot deduce type because message is not in a good state!");
     }
 }
+
+kzr::Message& 
+operator>>(kzr::Message& msg, kzr::Response& request) {
+    // decoding is a bit harder actually, we have to figure out the type first and emplace that into memory
+    if (auto op = msg.peek(); op) {
+        switch (convert(kzr::Operation(*op))) {
+#define X(name, _) \
+            case kzr::ConceptualOperation:: name : \
+                 request.emplace<kzr::BoundResponseType<kzr::ConceptualOperation:: name>>(); \
+                 msg.decode(std::get<kzr::BoundResponseType<kzr::ConceptualOperation:: name>>(request)); \
+                break 
+            X(Version, 100);
+            X(Auth, 102);
+            X(Attach, 104);
+            X(Error, 106);
+            X(Flush, 108);
+            X(Walk, 110);
+            X(Open, 112);
+            X(Create, 114);
+            X(Read, 116);
+            X(Write, 118);
+            X(Clunk, 120);
+            X(Remove, 122);
+            X(Stat, 124);
+            X(WStat, 126);
+#undef X
+            default:
+                throw kzr::Exception("Illegal type found!");
+        }
+        return msg;
+    } else {
+        throw kzr::Exception("Cannot deduce type because message is not in a good state!");
+    }
+}
