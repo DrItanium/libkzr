@@ -203,7 +203,7 @@ class ActionHeader {
         ActionHeader(Operation op, uint16_t tag);
         virtual ~ActionHeader() = default;
         constexpr auto getTag() const noexcept { return _tag; }
-        void setTag(uint16_t value) noexcept { _tag = value; }
+        virtual void setTag(uint16_t value) noexcept { _tag = value; }
         virtual void encode(Message& msg) const;
         virtual void decode(Message& msg);
         constexpr auto getOperation() const noexcept { return _op; }
@@ -300,20 +300,22 @@ class VersionRequest : public RequestAction<ConceptualOperation::Version>, publi
     public:
         using Parent = RequestAction<ConceptualOperation::Version>;
     public:
-        using Parent::Parent;
+        VersionRequest();
         ~VersionRequest() override = default;
         void encode(Message&) const override;
         void decode(Message&) override;
+        void setTag(uint16_t) noexcept override { }
 };
 
 class VersionResponse : public ResponseAction<ConceptualOperation::Version>, public VersionBody {
     public:
         using Parent = ResponseAction<ConceptualOperation::Version>;
     public:
-        using Parent::Parent;
+        VersionResponse();
         ~VersionResponse() override = default;
         void encode(Message&) const override;
         void decode(Message&) override;
+        void setTag(uint16_t) noexcept override { }
 };
 
 class AuthenticationRequest : public RequestAction<ConceptualOperation::Auth> {

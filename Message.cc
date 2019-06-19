@@ -110,6 +110,8 @@ ActionHeader::decode(Message& msg) {
     msg >> _op >> _tag;
 }
 
+VersionRequest::VersionRequest() : Parent(notag) { }
+VersionResponse::VersionResponse() : Parent(notag) { }
 void
 VersionRequest::encode(Message& msg) const {
     Parent::encode(msg);
