@@ -37,6 +37,7 @@
 #include <set>
 #include <sstream>
 #include <tuple>
+#include <variant>
 #include "Operations.h"
 #include "Exception.h"
 
@@ -590,6 +591,7 @@ class WStatRequest : public FixedRequest<ConceptualOperation::WStat>, public Has
         Stat _stat;
 };
 using WStatResponse = FixedResponse<ConceptualOperation::WStat>;
+
 
 } // end namespace kzr
 

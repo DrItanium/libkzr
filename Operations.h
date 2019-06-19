@@ -33,6 +33,8 @@
 #include <tuple>
 namespace kzr {
     enum class Operation : uint8_t {
+        TBad = 0, // these are unused codes so we can just reuse them here
+        RBad = 1,
 #define X(kind, value) \
         T ## kind = value, \
         R ## kind
@@ -127,8 +129,54 @@ constexpr auto ConceptualOperationToROperation = Operation::RError;
                 return ConceptualOperation::Undefined;
         }
     }
-    Operation getTMessageForm(ConceptualOperation op);
-    Operation getRMessageForm(ConceptualOperation op);
+    constexpr Operation getTMessageForm(ConceptualOperation op) noexcept {
+        switch (op) {
+#define X(name, _) \
+            case ConceptualOperation:: name: \
+            return Operation::T ## name 
+            X(Version, 100);
+            X(Auth, 102);
+            X(Attach, 104);
+            X(Error, 106);
+            X(Flush, 108);
+            X(Walk, 110);
+            X(Open, 112);
+            X(Create, 114);
+            X(Read, 116);
+            X(Write, 118);
+            X(Clunk, 120);
+            X(Remove, 122);
+            X(Stat, 124);
+            X(WStat, 126);
+#undef X
+            default:
+                return Operation::TBad;
+        }
+    }
+    constexpr Operation getRMessageForm(ConceptualOperation op) noexcept {
+        switch (op) {
+#define X(name, _) \
+            case ConceptualOperation:: name: \
+            return Operation::R ## name 
+            X(Version, 100);
+            X(Auth, 102);
+            X(Attach, 104);
+            X(Error, 106);
+            X(Flush, 108);
+            X(Walk, 110);
+            X(Open, 112);
+            X(Create, 114);
+            X(Read, 116);
+            X(Write, 118);
+            X(Clunk, 120);
+            X(Remove, 122);
+            X(Stat, 124);
+            X(WStat, 126);
+#undef X
+            default:
+                return Operation::RBad;
+        }
+    }
 
     template<typename T>
     constexpr auto isEven(T value) noexcept {
@@ -144,45 +192,48 @@ constexpr auto ConceptualOperationToROperation = Operation::RError;
     constexpr auto isResponse(Operation op) noexcept {
         return isOdd<uint8_t>(static_cast<uint8_t>(op));
     }
-    constexpr auto isSessionClass(Operation op) noexcept {
+    constexpr auto isSessionClass(ConceptualOperation op) noexcept {
         switch (op) {
-#define X(name) case Operation:: T ## name : case Operation:: R ## name
-            X(Version):
-            X(Auth):
-            X(Attach):
-            X(Flush):
-            X(Error):
-#undef X
+            case ConceptualOperation::Version:
+            case ConceptualOperation::Auth:
+            case ConceptualOperation::Attach:
+            case ConceptualOperation::Flush:
+            case ConceptualOperation::Error:
                 return true;
             default:
                 return false;
         }
     }
-    constexpr auto isFileClass(Operation op) noexcept {
+    constexpr auto isSessionClass(Operation op) noexcept {
+        return isSessionClass(convert(op));
+    }
+    constexpr auto isFileClass(ConceptualOperation op) noexcept {
         switch (op) {
-#define X(name) case Operation:: T ## name : case Operation:: R ## name
-            X(Walk):
-            X(Open):
-            X(Create):
-            X(Read):
-            X(Write):
-            X(Clunk):
-#undef X
+            case ConceptualOperation::Walk:
+            case ConceptualOperation::Open:
+            case ConceptualOperation::Create:
+            case ConceptualOperation::Read:
+            case ConceptualOperation::Write:
+            case ConceptualOperation::Clunk:
+                return true;
+            default:
+                return false;
+        }
+    }
+    constexpr auto isFileClass(Operation op) noexcept { 
+        return isFileClass(convert(op)); 
+    }
+    constexpr auto isMetadataClass(ConceptualOperation op) noexcept {
+        switch (op) {
+            case ConceptualOperation::Stat:
+            case ConceptualOperation::WStat:
                 return true;
             default:
                 return false;
         }
     }
     constexpr auto isMetadataClass(Operation op) noexcept {
-        switch (op) {
-#define X(name) case Operation:: T ## name : case Operation:: R ## name
-            X(Stat):
-            X(WStat):
-#undef X
-                return true;
-            default:
-                return false;
-        }
+        return isMetadataClass(convert(op));
     }
     constexpr auto expectedResponseKind(Operation op) noexcept {
         if (isResponse(op)) {
