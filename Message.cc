@@ -443,15 +443,28 @@ WriteResponse::decode(Message& msg) {
 void
 StatResponse::encode(Message& msg) const {
     Parent::encode(msg);
-    if (uint16_t len = size(); len != size()) {
-        throw Exception("Size of data container is too large!");
-    } else {
-        msg.encode(len); // we have to make this a uint16_t according to the spec
-        for (auto value : getData()) {
-            msg.encode(value);
-        }
-    }
+    msg << _data;
 }
+
+void
+StatResponse::decode(Message& msg) {
+    Parent::decode(msg);
+    msg >> _data;
+}
+
+void
+WStatRequest::encode(Message& msg) const {
+    Parent::encode(msg);
+    HasFid::encode(msg);
+    msg << _stat;
+}
+void
+WStatRequest::decode(Message& msg) {
+    Parent::decode(msg);
+    HasFid::decode(msg);
+    msg >> _stat;
+}
+
 
 } // end namespace kzr
 kzr::Message&

@@ -30,8 +30,6 @@
 #include <cstdint>
 namespace kzr {
     enum class Operation : uint8_t {
-        TBad = 0, // these are unused codes so we can just reuse them here
-        RBad = 1,
 #define X(kind, value) \
         T ## kind = value, \
         R ## kind
@@ -50,6 +48,8 @@ namespace kzr {
         X(Stat, 124),
         X(WStat, 126),
 #undef X
+        TBad = 0xFE, // these are unused codes so we can just reuse them here
+        RBad = 0xFF,
     };
 
     /**

@@ -568,16 +568,19 @@ using ClunkResponse = ResponseAction<ConceptualOperation::Clunk>;
 using RemoveRequest = FidRequest<ConceptualOperation::Remove>;
 using RemoveResponse = ResponseAction<ConceptualOperation::Remove>;
 using StatRequest = FidRequest<ConceptualOperation::Stat>;
-class StatResponse : public ResponseAction<ConceptualOperation::Stat>, public HasDataStorage {
-        // NOTE: we have to encode 16-bit length in this case so encode/decode is special
+class StatResponse : public ResponseAction<ConceptualOperation::Stat> {
     public:
-        // Rstat
         using Parent = ResponseAction<ConceptualOperation::Stat>;
     public:
         using Parent::Parent;
         ~StatResponse() override = default;
         void encode(Message&) const override;
         void decode(Message&) override;
+        const std::string& getData() const noexcept { return _data; }
+        std::string& getData() noexcept { return _data; }
+        void setData(const std::string& value) noexcept { _data = value; }
+    private:
+        std::string _data;
 };
 class WStatRequest : public RequestAction<ConceptualOperation::WStat>, public HasFid {
     public:
