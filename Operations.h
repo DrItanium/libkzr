@@ -308,6 +308,12 @@ constexpr auto ConceptualOperationToROperation = Operation::RError;
 #define BindRequestResponseToTypes(kind, request, response) \
     BindRequestToType(kind, request); \
     BindResponseToType(kind, response)
+
+template<ConceptualOperation op>
+using BoundRequestType = typename RequestToTypeBinding<op>::BoundType;
+
+template<ConceptualOperation op>
+using BoundResponseType = typename ResponseToTypeBinding<op>::BoundType;
 } // end namespce kzr
 kzr::Message& operator<<(kzr::Message&, kzr::Operation);
 kzr::Message& operator>>(kzr::Message&, kzr::Operation&);

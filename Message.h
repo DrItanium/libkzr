@@ -283,6 +283,7 @@ class VersionResponse : public FixedResponse<ConceptualOperation::Version>, publ
         void encode(Message&) const override;
         void decode(Message&) override;
 };
+BindRequestResponseToTypes(Version, VersionRequest, VersionResponse);
 
 class AuthenticationRequest : public FixedRequest<ConceptualOperation::Auth> {
     public:
@@ -315,6 +316,7 @@ class AuthenticationResponse : public FixedResponse<ConceptualOperation::Auth>, 
         void encode(Message&) const override;
         void decode(Message&) override;
 };
+BindRequestResponseToTypes(Auth, AuthenticationRequest, AuthenticationResponse);
 
 class FlushRequest : public FixedRequest<ConceptualOperation::Flush> {
     public:
@@ -331,6 +333,7 @@ class FlushRequest : public FixedRequest<ConceptualOperation::Flush> {
 };
 
 using FlushResponse = FixedResponse<ConceptualOperation::Flush>;
+BindRequestResponseToTypes(Flush, FlushRequest, FlushResponse);
 
 class AttachRequest : public FixedRequest<ConceptualOperation::Attach>, public HasFid {
     public:
@@ -366,6 +369,8 @@ class AttachResponse : public FixedResponse<ConceptualOperation::Attach>, public
         void decode(Message&) override;
 };
 
+BindRequestResponseToTypes(Attach, AttachRequest, AttachResponse);
+
 class WalkRequest : public FixedRequest<ConceptualOperation::Walk>, public HasFid {
     public:
         using Parent = FixedRequest<ConceptualOperation:: Walk>; 
@@ -396,6 +401,7 @@ class WalkResponse : public FixedResponse<ConceptualOperation::Walk> {
     private:
         std::vector<Qid> _wqid;
 };
+BindRequestResponseToTypes(Walk, WalkRequest, WalkResponse);
 
 class OpenRequest : public FixedRequest<ConceptualOperation::Open>, public HasFid {
     public:
@@ -437,6 +443,7 @@ class OpenOrCreateResponse : public FixedResponse<op>, public HasQid {
 
 };
 using OpenResponse = OpenOrCreateResponse<ConceptualOperation::Open>;
+BindRequestResponseToTypes(Open, OpenRequest, OpenResponse);
 class CreateRequest : public FixedRequest<ConceptualOperation::Create>, public HasFid {
     public:
         using Parent = FixedRequest<ConceptualOperation:: Create>; 
@@ -458,6 +465,7 @@ class CreateRequest : public FixedRequest<ConceptualOperation::Create>, public H
 };
 
 using CreateResponse = OpenOrCreateResponse<ConceptualOperation::Create>;
+BindRequestResponseToTypes(Create, CreateRequest, CreateResponse);
 
 template<ConceptualOperation op>
 class FidRequest : public FixedRequest<op>, public HasFid {
@@ -539,6 +547,7 @@ class ReadResponse : public FixedResponse<ConceptualOperation::Read>, public Has
         void encode(Message&) const override;
         void decode(Message&) override;
 };
+BindRequestResponseToTypes(Read, ReadRequest, ReadResponse);
 
 class WriteRequest : public ReadWriteRequest<ConceptualOperation::Write>, public HasDataStorage {
     public:
@@ -560,10 +569,13 @@ class WriteResponse : public FixedResponse<ConceptualOperation::Write>, public H
         void decode(Message&) override;
 };
 
+BindRequestResponseToTypes(Write, WriteRequest, WriteResponse);
 using ClunkRequest = FidRequest<ConceptualOperation::Clunk>;
 using ClunkResponse = FixedResponse<ConceptualOperation::Clunk>;
+BindRequestResponseToTypes(Clunk, ClunkRequest, ClunkResponse);
 using RemoveRequest = FidRequest<ConceptualOperation::Remove>;
 using RemoveResponse = FixedResponse<ConceptualOperation::Remove>;
+BindRequestResponseToTypes(Remove, RemoveRequest, RemoveResponse);
 using StatRequest = FidRequest<ConceptualOperation::Stat>;
 class StatResponse : public FixedResponse<ConceptualOperation::Stat>, public HasDataStorage {
         // NOTE: we have to encode 16-bit length in this case so encode/decode is special
@@ -576,6 +588,7 @@ class StatResponse : public FixedResponse<ConceptualOperation::Stat>, public Has
         void encode(Message&) const override;
         void decode(Message&) override;
 };
+BindRequestResponseToTypes(Stat, StatRequest, StatResponse);
 class WStatRequest : public FixedRequest<ConceptualOperation::WStat>, public HasFid {
     public:
         using Parent = FixedRequest<ConceptualOperation::WStat>;
@@ -592,7 +605,6 @@ class WStatRequest : public FixedRequest<ConceptualOperation::WStat>, public Has
 };
 using WStatResponse = FixedResponse<ConceptualOperation::WStat>;
 
-BindRequestResponseToTypes(Stat, StatRequest, StatResponse);
 BindRequestResponseToTypes(WStat, WStatRequest, WStatResponse);
 
 
