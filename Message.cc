@@ -228,10 +228,9 @@ void
 Stat::encode(Message& msg) const {
     // need to construct the inner message and then tack the stat onto the front
     Message innerMessage;
-    innerMessage << _type 
-        << _dev 
-        << _qid 
-        << _mode
+    innerMessage << _type << _dev;
+    HasQid::encode(msg);
+    innerMessage << _mode
         << _atime
         << _mtime
         << _length
@@ -250,9 +249,9 @@ Stat::decode(Message& msg) {
     uint16_t len;
     msg >> len
         >> _type
-        >> _dev
-        >> _qid
-        >> _mode
+        >> _dev;
+    HasQid::decode(msg);
+    msg >> _mode
         >> _atime
         >> _mtime
         >> _length

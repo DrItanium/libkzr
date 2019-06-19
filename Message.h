@@ -127,14 +127,22 @@ class Qid  {
         uint64_t _path;
 };
 
-class Stat {
+class HasQid {
+    public:
+        Qid& getQid() noexcept { return _qid; }
+        const Qid& getQid() const noexcept { return _qid; }
+        void setQid(const Qid& qid) { _qid = qid; }
+        void encode(Message& msg) const;
+        void decode(Message& msg);
+    private:
+        Qid _qid;
+};
+
+class Stat : public HasQid {
     public:
         Stat() = default;
         void encode(Message&) const;
         void decode(Message&);
-        Qid& getQid() noexcept { return _qid; }
-        const Qid& getQid() const noexcept { return _qid; }
-        void setQid(const Qid& qid) noexcept { _qid = qid; }
 #define X(name, field) \
         auto get ## name () const noexcept { return field ; } \
         void set ## name ( const std::string& value) noexcept { field = value ; }
@@ -156,7 +164,6 @@ class Stat {
     private:
         uint16_t _type;
         uint32_t _dev;
-        Qid _qid;
         uint32_t _mode,
                  _atime,
                  _mtime;
@@ -175,16 +182,6 @@ class HasFid {
         void setFid(uint32_t value) noexcept { _fid = value; }
     private:
         uint32_t _fid;
-};
-class HasQid {
-    public:
-        Qid& getQid() noexcept { return _qid; }
-        const Qid& getQid() const noexcept { return _qid; }
-        void setQid(const Qid& qid) { _qid = qid; }
-        void encode(Message& msg) const;
-        void decode(Message& msg);
-    private:
-        Qid _qid;
 };
 
 /**
