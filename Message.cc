@@ -392,6 +392,29 @@ CreateRequest::decode(Message& msg) {
     msg >> _perm >> _mode;
 }
 
+void
+ReadRequest::encode(Message& msg) const {
+    Parent::encode(msg);
+    HasCount::encode(msg);
+}
+
+void
+ReadRequest::decode(Message& msg) {
+    Parent::decode(msg);
+    HasCount::decode(msg);
+}
+
+void
+ReadResponse::encode(Message& msg) const {
+    Parent::encode(msg);
+    HasDataStorage::encode(msg);
+}
+
+void
+ReadResponse::decode(Message& msg) {
+    Parent::decode(msg);
+    HasDataStorage::decode(msg);
+}
 
 } // end namespace kzr
 kzr::Message&
