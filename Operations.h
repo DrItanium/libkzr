@@ -237,7 +237,7 @@ constexpr auto ConceptualOperationToROperation = Operation::RError;
     }
     constexpr auto expectedResponseKind(Operation op) noexcept {
         if (isResponse(op)) {
-            return Operation::RError;
+            return Operation::RBad;
         } else {
             // must be a transmit message
             switch (op) {
@@ -257,7 +257,8 @@ constexpr auto ConceptualOperationToROperation = Operation::RError;
                 X(Stat);
                 X(WStat);
 #undef X
-                default: return Operation::RError;
+                default: 
+                    return Operation::RBad;
             }
         }
     }
