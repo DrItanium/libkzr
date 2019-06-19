@@ -708,5 +708,7 @@ kzr::Message& operator<<(kzr::Message&, const kzr::Request&);
 kzr::Message& operator>>(kzr::Message&, kzr::Request&);
 kzr::Message& operator<<(kzr::Message&, const kzr::Response&);
 kzr::Message& operator>>(kzr::Message&, kzr::Response&);
+kzr::Message& operator<<(kzr::Message&, const kzr::Interaction&);
+kzr::Message& operator>>(kzr::Message&, kzr::Interaction&);
 #endif // end KZR_MESSAGE_H__
 

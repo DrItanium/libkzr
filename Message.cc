@@ -512,3 +512,25 @@ operator>>(kzr::Message& msg, kzr::Response& request) {
         throw kzr::Exception("Cannot deduce type because message is not in a good state!");
     }
 }
+
+kzr::Message&
+operator<<(kzr::Message& msg, const kzr::Interaction& thing) {
+    std::visit([&msg](auto&& value) { msg << value; }, thing); 
+    return msg;
+}
+kzr::Message&
+operator>>(kzr::Message& msg, kzr::Interaction& thing) {
+    if (auto op = msg.peek(); op) {
+        if (auto lookup = kzr::Operation(*op); kzr::isRequest(lookup)) {
+            thing.emplace<kzr::Request>();
+            msg >> std::get<kzr::Request>(thing);
+        } else {
+            // its a response so act accordingly
+            thing.emplace<kzr::Response>();
+            msg >> std::get<kzr::Response>(thing);
+        }
+        return msg;
+    } else {
+        throw kzr::Exception("Cannot deduce type because message is not in a good state!");
+    }
+}
