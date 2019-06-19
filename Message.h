@@ -653,9 +653,6 @@ KZR_PROTOCOL_KINDS
 #undef X
     >;
 
-/// A top level return type that clients and servers send off
-using Interaction = std::variant<Response, Request>;
-
 } // end namespace kzr
 
 template<typename T>
@@ -699,7 +696,5 @@ kzr::Message& operator<<(kzr::Message&, const kzr::Request&);
 kzr::Message& operator>>(kzr::Message&, kzr::Request&);
 kzr::Message& operator<<(kzr::Message&, const kzr::Response&);
 kzr::Message& operator>>(kzr::Message&, kzr::Response&);
-kzr::Message& operator<<(kzr::Message&, const kzr::Interaction&);
-kzr::Message& operator>>(kzr::Message&, kzr::Interaction&);
 #endif // end KZR_MESSAGE_H__
 
