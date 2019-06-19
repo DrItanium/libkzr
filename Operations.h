@@ -28,9 +28,6 @@
 #ifndef KZR_OPERATIONS_H__
 #define KZR_OPERATIONS_H__
 #include <cstdint>
-#include <istream>
-#include <ostream>
-#include <tuple>
 namespace kzr {
     enum class Operation : uint8_t {
         TBad = 0, // these are unused codes so we can just reuse them here
