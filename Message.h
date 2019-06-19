@@ -31,10 +31,8 @@
 #include <istream>
 #include <ostream>
 #include <string>
-#include <array>
-#include <list>
+#include <optional>
 #include <vector>
-#include <set>
 #include <sstream>
 #include <tuple>
 #include <variant>
@@ -697,21 +695,6 @@ kzr::Message& operator>>(kzr::Message& msg, std::vector<T>& collec) {
     return msg;
 }
 
-template<typename T, size_t capacity>
-kzr::Message& operator<<(kzr::Message& msg, const std::array<T, capacity>& a) {
-    for (const auto& ptr : a) {
-        msg << ptr;
-    }
-    return msg;
-}
-
-template<typename T, size_t capacity>
-kzr::Message& operator>>(kzr::Message& msg, std::array<T, capacity>& a) {
-    for (auto& ptr : a) {
-        msg >> ptr;
-    }
-    return msg;
-}
 kzr::Message& operator<<(kzr::Message&, const kzr::Request&);
 kzr::Message& operator>>(kzr::Message&, kzr::Request&);
 kzr::Message& operator<<(kzr::Message&, const kzr::Response&);
