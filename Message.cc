@@ -440,6 +440,19 @@ WriteResponse::decode(Message& msg) {
     HasCount::decode(msg);
 }
 
+void
+StatResponse::encode(Message& msg) const {
+    Parent::encode(msg);
+    if (uint16_t len = size(); len != size()) {
+        throw Exception("Size of data container is too large!");
+    } else {
+        msg.encode(len); // we have to make this a uint16_t according to the spec
+        for (auto value : getData()) {
+            msg.encode(value);
+        }
+    }
+}
+
 } // end namespace kzr
 kzr::Message&
 operator>>(kzr::Message& msg, std::set<std::string>& collec) {
