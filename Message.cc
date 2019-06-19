@@ -416,6 +416,30 @@ ReadResponse::decode(Message& msg) {
     HasDataStorage::decode(msg);
 }
 
+void
+WriteRequest::encode(Message& msg) const {
+    Parent::encode(msg);
+    HasDataStorage::encode(msg);
+}
+
+void
+WriteRequest::decode(Message& msg) {
+    Parent::decode(msg);
+    HasDataStorage::decode(msg);
+}
+
+void
+WriteResponse::encode(Message& msg) const {
+    Parent::encode(msg);
+    HasCount::encode(msg);
+}
+
+void
+WriteResponse::decode(Message& msg) {
+    Parent::decode(msg);
+    HasCount::decode(msg);
+}
+
 } // end namespace kzr
 kzr::Message&
 operator>>(kzr::Message& msg, std::set<std::string>& collec) {
