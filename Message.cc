@@ -362,6 +362,36 @@ Message::peek() noexcept {
     }
 }
 
+void
+OpenRequest::encode(Message& msg) const {
+    Parent::encode(msg);
+    HasFid::encode(msg);
+    msg << _mode;
+}
+
+void
+OpenRequest::decode(Message& msg) {
+    Parent::decode(msg);
+    HasFid::decode(msg);
+    msg >> _mode;
+}
+
+void
+CreateRequest::encode(Message& msg) const {
+    Parent::encode(msg);
+    HasFid::encode(msg);
+    HasName::encode(msg);
+    msg << _perm << _mode;
+}
+
+void
+CreateRequest::decode(Message& msg) {
+    Parent::decode(msg);
+    HasFid::decode(msg);
+    HasName::decode(msg);
+    msg >> _perm >> _mode;
+}
+
 
 } // end namespace kzr
 kzr::Message&
