@@ -40,6 +40,7 @@
 #include "Exception.h"
 
 namespace kzr {
+constexpr uint16_t notag = uint16_t(~0);
 constexpr char version9pString[] = "9P";
 constexpr char version9p2000String[] = "9P2000";
 constexpr uint16_t build(uint8_t lower, uint8_t upper) noexcept {
