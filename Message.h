@@ -241,6 +241,34 @@ class RequestAction : public Action<getTMessageForm(op)> {
         using Parent::Parent;
         ~RequestAction() override = default;
 };
+
+class UndefinedResponse final : public Action<Operation::RBad> {
+    public:
+        using Parent = Action<Operation::RBad>;
+    public:
+        using Parent::Parent;
+        ~UndefinedResponse() override = default;
+        void encode(Message&) const override {
+            throw Exception("Undefined response!");
+        }
+        void decode(Message&) override {
+            throw Exception("Undefined response!");
+        }
+};
+
+class UndefinedRequest final : public Action<Operation::TBad> {
+    public:
+        using Parent = Action<Operation::TBad>;
+    public:
+        using Parent::Parent;
+        ~UndefinedRequest() override = default;
+        void encode(Message&) const override {
+            throw Exception("Undefined request!");
+        }
+        void decode(Message&) override {
+            throw Exception("Undefined request!");
+        }
+};
 class ErrorResponse : public ResponseAction<ConceptualOperation::Error> {
     public:
         using Parent = ResponseAction<ConceptualOperation::Error>;
@@ -614,40 +642,16 @@ BindRequestResponseToTypes(Stat, StatRequest, StatResponse);
 BindRequestResponseToTypes(WStat, WStatRequest, WStatResponse);
 
 using Response = std::variant<
-#define X(name, _) BoundResponseType<ConceptualOperation:: name > 
-            X(Version, 100),
-            X(Auth, 102),
-            X(Attach, 104),
-            X(Error, 106),
-            X(Flush, 108),
-            X(Walk, 110),
-            X(Open, 112),
-            X(Create, 114),
-            X(Read, 116),
-            X(Write, 118),
-            X(Clunk, 120),
-            X(Remove, 122),
-            X(Stat, 124),
-            X(WStat, 126)
+UndefinedResponse
+#define X(name, _) ,BoundResponseType<ConceptualOperation:: name >
+PROTOCOL_KINDS
 #undef X
     >;
 
 using Request = std::variant<
-#define X(name, _) BoundRequestType<ConceptualOperation:: name > 
-            X(Version, 100),
-            X(Auth, 102),
-            X(Attach, 104),
-            X(Error, 106),
-            X(Flush, 108),
-            X(Walk, 110),
-            X(Open, 112),
-            X(Create, 114),
-            X(Read, 116),
-            X(Write, 118),
-            X(Clunk, 120),
-            X(Remove, 122),
-            X(Stat, 124),
-            X(WStat, 126)
+UndefinedRequest
+#define X(name, _) , BoundRequestType<ConceptualOperation:: name >
+PROTOCOL_KINDS
 #undef X
     >;
 

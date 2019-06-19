@@ -29,24 +29,26 @@
 #define KZR_OPERATIONS_H__
 #include <cstdint>
 namespace kzr {
+#define PROTOCOL_KINDS \
+X(Version, 100) \
+X(Auth, 102) \
+X(Attach, 104) \
+X(Error, 106) \
+X(Flush, 108) \
+X(Walk, 110) \
+X(Open, 112) \
+X(Create, 114) \
+X(Read, 116) \
+X(Write, 118) \
+X(Clunk, 120) \
+X(Remove, 122) \
+X(Stat, 124) \
+X(WStat, 126) 
     enum class Operation : uint8_t {
 #define X(kind, value) \
         T ## kind = value, \
-        R ## kind
-        X(Version, 100),
-        X(Auth, 102),
-        X(Attach, 104),
-        X(Error, 106),
-        X(Flush, 108),
-        X(Walk, 110),
-        X(Open, 112),
-        X(Create, 114),
-        X(Read, 116),
-        X(Write, 118),
-        X(Clunk, 120),
-        X(Remove, 122),
-        X(Stat, 124),
-        X(WStat, 126),
+        R ## kind,
+        PROTOCOL_KINDS
 #undef X
         TBad = 0xFE, // these are unused codes so we can just reuse them here
         RBad = 0xFF,
@@ -57,21 +59,8 @@ namespace kzr {
      */
     enum class ConceptualOperation : uint8_t {
         Undefined,
-#define X(kind, value) kind
-        X(Version, 100),
-        X(Auth, 102),
-        X(Attach, 104),
-        X(Error, 106),
-        X(Flush, 108),
-        X(Walk, 110),
-        X(Open, 112),
-        X(Create, 114),
-        X(Read, 116),
-        X(Write, 118),
-        X(Clunk, 120),
-        X(Remove, 122),
-        X(Stat, 124),
-        X(WStat, 126),
+#define X(kind, value) kind,
+PROTOCOL_KINDS
 #undef X
     };
     constexpr ConceptualOperation convert(Operation op) noexcept {
@@ -79,21 +68,8 @@ namespace kzr {
 #define X(name, _) \
             case Operation::T ## name : \
             case Operation::R ## name : \
-                 return ConceptualOperation:: name
-        X(Version, 100);
-        X(Auth, 102);
-        X(Attach, 104);
-        X(Error, 106);
-        X(Flush, 108);
-        X(Walk, 110);
-        X(Open, 112);
-        X(Create, 114);
-        X(Read, 116);
-        X(Write, 118);
-        X(Clunk, 120);
-        X(Remove, 122);
-        X(Stat, 124);
-        X(WStat, 126);
+                 return ConceptualOperation:: name;
+PROTOCOL_KINDS
 #undef X
             default:
                 return ConceptualOperation::Undefined;
@@ -103,21 +79,8 @@ namespace kzr {
         switch (op) {
 #define X(name, _) \
             case ConceptualOperation:: name: \
-            return Operation::T ## name 
-            X(Version, 100);
-            X(Auth, 102);
-            X(Attach, 104);
-            X(Error, 106);
-            X(Flush, 108);
-            X(Walk, 110);
-            X(Open, 112);
-            X(Create, 114);
-            X(Read, 116);
-            X(Write, 118);
-            X(Clunk, 120);
-            X(Remove, 122);
-            X(Stat, 124);
-            X(WStat, 126);
+            return Operation::T ## name ;
+PROTOCOL_KINDS
 #undef X
             default:
                 return Operation::TBad;
@@ -127,21 +90,8 @@ namespace kzr {
         switch (op) {
 #define X(name, _) \
             case ConceptualOperation:: name: \
-            return Operation::R ## name 
-            X(Version, 100);
-            X(Auth, 102);
-            X(Attach, 104);
-            X(Error, 106);
-            X(Flush, 108);
-            X(Walk, 110);
-            X(Open, 112);
-            X(Create, 114);
-            X(Read, 116);
-            X(Write, 118);
-            X(Clunk, 120);
-            X(Remove, 122);
-            X(Stat, 124);
-            X(WStat, 126);
+            return Operation::R ## name;
+            PROTOCOL_KINDS
 #undef X
             default:
                 return Operation::RBad;
@@ -211,21 +161,8 @@ namespace kzr {
         } else {
             // must be a transmit message
             switch (op) {
-#define X(kind) case Operation:: T ## kind : return Operation:: R ## kind
-                X(Version);
-                X(Auth);
-                X(Attach);
-                X(Error);
-                X(Flush);
-                X(Walk);
-                X(Open);
-                X(Create);
-                X(Read);
-                X(Write);
-                X(Clunk);
-                X(Remove);
-                X(Stat);
-                X(WStat);
+#define X(kind, _) case Operation:: T ## kind : return Operation:: R ## kind;
+                PROTOCOL_KINDS
 #undef X
                 default: 
                     return Operation::RBad;
