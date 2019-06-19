@@ -140,7 +140,17 @@ class HasQid {
         Qid _qid;
 };
 
-class Stat : public HasQid {
+class HasName {
+    public:
+        const std::string& getName() const noexcept { return _name; }
+        void setName(const std::string& value) noexcept { _name = value; }
+        void encode(Message& msg) const;
+        void decode(Message& msg);
+    private:
+        std::string _name;
+};
+
+class Stat : public HasQid, public HasName {
     public:
         Stat() = default;
         void encode(Message&) const;
@@ -148,7 +158,6 @@ class Stat : public HasQid {
 #define X(name, field) \
         auto get ## name () const noexcept { return field ; } \
         void set ## name ( const std::string& value) noexcept { field = value ; }
-        X(FileName, _name);
         X(Group, _gid);
         X(Owner, _uid);
         X(UserThatLastModified, _muid);
@@ -170,8 +179,7 @@ class Stat : public HasQid {
                  _atime,
                  _mtime;
         uint64_t _length;
-        std::string _name,
-            _uid,
+        std::string _uid,
             _gid,
             _muid;
 };
@@ -435,7 +443,7 @@ class OpenOrCreateResponse : public ResponseAction<op>, public HasQid {
 
 };
 using OpenResponse = OpenOrCreateResponse<ConceptualOperation::Open>;
-class CreateRequest : public RequestAction<ConceptualOperation::Create>, public HasFid {
+class CreateRequest : public RequestAction<ConceptualOperation::Create>, public HasFid, public HasName {
     public:
         using Parent = RequestAction<ConceptualOperation:: Create>; 
     public: 
@@ -447,10 +455,7 @@ class CreateRequest : public RequestAction<ConceptualOperation::Create>, public 
         void setPermissions(uint32_t v) noexcept { _perm = v; }
         constexpr auto getMode() const noexcept { return _mode; }
         void setMode(uint8_t v) noexcept { _mode = v; }
-        auto getName() const noexcept { return  _name ; } 
-        void setName(const std::string& value ) noexcept { _name  = value ; }
     private:
-        std::string _name;
         uint32_t _perm;
         uint8_t _mode;
 };
