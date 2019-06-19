@@ -465,6 +465,28 @@ WStatRequest::decode(Message& msg) {
     msg >> _stat;
 }
 
+void
+HasDataStorage::encode(Message& msg) const {
+    if (uint32_t len = size(); len != size()) {
+        throw Exception("data storage too large for transmission");
+    } else {
+        msg << len;
+        for (auto i : _data) {
+            msg << i;
+        }
+    }
+}
+
+void
+HasDataStorage::decode(Message& msg) {
+    uint32_t size;
+    msg >> size;
+    _data.reserve(size);
+    for (decltype(size) i = 0; i < size; ++i) {
+        _data.emplace_back(msg.decode<uint8_t>());
+    }
+}
+
 
 } // end namespace kzr
 kzr::Message&
