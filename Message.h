@@ -649,6 +649,7 @@ using Request = std::variant<
     >;
 
 
+
 } // end namespace kzr
 
 template<typename T>
@@ -707,5 +708,9 @@ kzr::Message& operator>>(kzr::Message& msg, std::array<T, capacity>& a) {
     }
     return msg;
 }
+kzr::Message& operator<<(kzr::Message&, const kzr::Request&);
+kzr::Message& operator>>(kzr::Message&, kzr::Request&);
+kzr::Message& operator<<(kzr::Message&, const kzr::Response&);
+kzr::Message& operator>>(kzr::Message&, kzr::Response&);
 #endif // end KZR_MESSAGE_H__
 

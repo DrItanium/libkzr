@@ -425,3 +425,42 @@ operator<<(kzr::Message& msg, const std::list<std::string>& collec) {
         return msg;
     }
 }
+
+kzr::Message& 
+operator<<(kzr::Message& msg, const kzr::Request& request) {
+    std::visit([&msg](auto&& value) { msg << value; }, request);
+    return msg;
+}
+kzr::Message& 
+operator<<(kzr::Message& msg, const kzr::Response& request) {
+    std::visit([&msg](auto&& value) { msg << value; }, request);
+    return msg;
+}
+#if 0
+kzr::Message& 
+operator>>(kzr::Message& msg, Request& request) {
+    // decoding is a bit harder actually, we have to figure out the type first and emplace that into memory
+    
+#define X(name, _) BoundRequestType<ConceptualOperation:: name > 
+            X(Version, 100),
+            X(Auth, 102),
+            X(Attach, 104),
+            X(Error, 106),
+            X(Flush, 108),
+            X(Walk, 110),
+            X(Open, 112),
+            X(Create, 114),
+            X(Read, 116),
+            X(Write, 118),
+            X(Clunk, 120),
+            X(Remove, 122),
+            X(Stat, 124),
+            X(WStat, 126)
+#undef X
+}
+kzr::Message& 
+operator<<(kzr::Message& msg, const Response& request) {
+    std::visit([](auto&& value) { msg << value; }, request);
+    return msg;
+}
+#endif
