@@ -643,7 +643,8 @@ using Request = std::variant<
 #undef X
     >;
 
-
+/// A top level return type that clients and servers send off
+using Interaction = std::variant<Response, Request>;
 
 } // end namespace kzr
 
