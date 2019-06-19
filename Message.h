@@ -223,17 +223,17 @@ class Action : public ActionHeader {
         }
 };
 template<ConceptualOperation op>
-class FixedResponse : public Action<ConceptualOperationToROperation<op>> {
+class FixedResponse : public Action<getRMessageForm(op)> {
     public:
-        using Parent = Action<ConceptualOperationToROperation<op>>;
+        using Parent = Action<getRMessageForm(op)>;
     public:
         using Parent::Parent;
         ~FixedResponse() override = default;
 };
 template<ConceptualOperation op>
-class FixedRequest : public Action<ConceptualOperationToTOperation<op>> {
+class FixedRequest : public Action<getTMessageForm(op)> {
     public:
-        using Parent = Action<ConceptualOperationToTOperation<op>>;
+        using Parent = Action<getTMessageForm(op)>;
     public:
         using Parent::Parent;
         ~FixedRequest() override = default;

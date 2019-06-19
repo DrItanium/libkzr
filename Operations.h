@@ -77,33 +77,6 @@ namespace kzr {
         X(WStat, 126),
 #undef X
     };
-template<Operation op>
-constexpr auto OperationToConceptualOperation = ConceptualOperation::Undefined;
-
-template<ConceptualOperation op>
-constexpr auto ConceptualOperationToTOperation = Operation::RError;
-template<ConceptualOperation op>
-constexpr auto ConceptualOperationToROperation = Operation::RError;
-#define X(kind, value) \
-        template<> constexpr auto OperationToConceptualOperation< Operation::T ## kind > = ConceptualOperation:: kind ; \
-        template<> constexpr auto OperationToConceptualOperation< Operation::R ## kind > = ConceptualOperation:: kind ; \
-        template<> constexpr auto ConceptualOperationToTOperation < ConceptualOperation :: kind > = Operation::T ## kind ; \
-        template<> constexpr auto ConceptualOperationToROperation < ConceptualOperation :: kind > = Operation::R ## kind 
-        X(Version, 100);
-        X(Auth, 102);
-        X(Attach, 104);
-        X(Error, 106);
-        X(Flush, 108);
-        X(Walk, 110);
-        X(Open, 112);
-        X(Create, 114);
-        X(Read, 116);
-        X(Write, 118);
-        X(Clunk, 120);
-        X(Remove, 122);
-        X(Stat, 124);
-        X(WStat, 126);
-#undef X
     constexpr ConceptualOperation convert(Operation op) noexcept {
         switch (op) {
 #define X(name, _) \
