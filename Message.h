@@ -178,13 +178,13 @@ class HasFid {
 };
 class HasQid {
     public:
-        Qid& getQid() noexcept { return _aqid; }
-        const Qid& getQid() const noexcept { return _aqid; }
-        void setQid(const Qid& qid) { _aqid = qid; }
+        Qid& getQid() noexcept { return _qid; }
+        const Qid& getQid() const noexcept { return _qid; }
+        void setQid(const Qid& qid) { _qid = qid; }
         void encode(Message& msg) const;
         void decode(Message& msg);
     private:
-        Qid _aqid;
+        Qid _qid;
 };
 
 /**

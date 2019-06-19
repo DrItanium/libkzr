@@ -285,9 +285,9 @@ AuthenticationResponse::decode(Message& msg) {
     HasQid::decode(msg);
 }
 void 
-HasQid::encode(Message& msg) const { msg << _aqid; }
+HasQid::encode(Message& msg) const { msg << _qid; }
 void 
-HasQid::decode(Message& msg) { msg >> _aqid; }
+HasQid::decode(Message& msg) { msg >> _qid; }
 void 
 HasFid::encode(Message& msg) const { msg << _fid; }
 void 
