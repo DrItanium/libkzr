@@ -111,14 +111,33 @@ Action::decode(Message& msg) {
 }
 
 void
-VersionAction::encode(Message& msg) const {
+VersionRequest::encode(Message& msg) const {
     Parent::encode(msg);
+    VersionBody::encode(msg);
+}
+void
+VersionRequest::decode(Message& msg) {
+    Parent::decode(msg);
+    VersionBody::decode(msg);
+}
+
+void
+VersionResponse::encode(Message& msg) const {
+    Parent::encode(msg);
+    VersionBody::encode(msg);
+}
+void
+VersionResponse::decode(Message& msg) {
+    Parent::decode(msg);
+    VersionBody::decode(msg);
+}
+void
+VersionBody::encode(Message& msg) const {
     msg << _msize << _version;
 }
 
 void
-VersionAction::decode(Message& msg) {
-    Parent::decode(msg);
+VersionBody::decode(Message& msg) {
     msg >> _msize >> _version;
 }
 

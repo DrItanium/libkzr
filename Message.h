@@ -253,15 +253,10 @@ class ErrorResponse : public FixedResponse<ConceptualOperation::Error> {
     private:
         std::string _ename;
 };
-
-class VersionAction : public Action {
+class VersionBody {
     public:
-        using Parent = Action;
-    public:
-        using Parent::Parent;
-        ~VersionAction() override = default;
-        void encode(Message&) const override;
-        void decode(Message&) override;
+        void encode(Message&) const;
+        void decode(Message&);
         auto getVersion() const noexcept { return _version; }
         constexpr auto getMsize() const noexcept { return _msize; }
         void setMsize(uint16_t msize) noexcept { _msize = msize; }
@@ -269,6 +264,26 @@ class VersionAction : public Action {
     private:
         std::string _version;
         uint16_t _msize;
+
+};
+class VersionRequest : public FixedRequest<ConceptualOperation::Version>, public VersionBody {
+    public:
+        using Parent = FixedRequest<ConceptualOperation::Version>;
+    public:
+        using Parent::Parent;
+        ~VersionRequest() override = default;
+        void encode(Message&) const override;
+        void decode(Message&) override;
+};
+
+class VersionResponse : public FixedResponse<ConceptualOperation::Version>, public VersionBody {
+    public:
+        using Parent = FixedResponse<ConceptualOperation::Version>;
+    public:
+        using Parent::Parent;
+        ~VersionResponse() override = default;
+        void encode(Message&) const override;
+        void decode(Message&) override;
 };
 
 class AuthenticationRequest : public FixedRequest<ConceptualOperation::Auth> {
