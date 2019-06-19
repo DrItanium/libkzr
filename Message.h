@@ -189,12 +189,12 @@ class HasFid {
  * Holds the arguments of a request by the client or a response by the server;
  * This top level class contains the elements common to all message kinds
  */
-class Action {
+class ActionHeader {
     public:
-        Action() = default;
-        explicit Action(Operation op);
-        Action(Operation op, uint16_t tag);
-        virtual ~Action() = default;
+        ActionHeader() = default;
+        explicit ActionHeader(Operation op);
+        ActionHeader(Operation op, uint16_t tag);
+        virtual ~ActionHeader() = default;
         constexpr auto getTag() const noexcept { return _tag; }
         void setTag(uint16_t value) noexcept { _tag = value; }
         virtual void setOperation(Operation op) noexcept { _op = op; }
@@ -210,29 +210,29 @@ class Action {
         uint16_t _tag;
 };
 template<Operation op>
-class FixedAction : public Action {
+class Action : public ActionHeader {
     public:
-        using Parent = Action;
+        using Parent = ActionHeader;
     public:
-        FixedAction() : Parent(op) { }
-        explicit FixedAction(uint16_t tag) : Parent(op, tag) { }
-        ~FixedAction() override = default;
+        Action() : Parent(op) { }
+        explicit Action(uint16_t tag) : Parent(op, tag) { }
+        ~Action() override = default;
         void setOperation(Operation) noexcept override { 
             // do nothing since it is fixed!
         }
 };
 template<ConceptualOperation op>
-class FixedResponse : public FixedAction<ConceptualOperationToROperation<op>> {
+class FixedResponse : public Action<ConceptualOperationToROperation<op>> {
     public:
-        using Parent = FixedAction<ConceptualOperationToROperation<op>>;
+        using Parent = Action<ConceptualOperationToROperation<op>>;
     public:
         using Parent::Parent;
         ~FixedResponse() override = default;
 };
 template<ConceptualOperation op>
-class FixedRequest : public FixedAction<ConceptualOperationToTOperation<op>> {
+class FixedRequest : public Action<ConceptualOperationToTOperation<op>> {
     public:
-        using Parent = FixedAction<ConceptualOperationToTOperation<op>>;
+        using Parent = Action<ConceptualOperationToTOperation<op>>;
     public:
         using Parent::Parent;
         ~FixedRequest() override = default;
@@ -251,6 +251,7 @@ class ErrorResponse : public FixedResponse<ConceptualOperation::Error> {
     private:
         std::string _ename;
 };
+BindResponseToType(Error, ErrorResponse);
 class VersionBody {
     public:
         void encode(Message&) const;

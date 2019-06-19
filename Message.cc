@@ -99,14 +99,14 @@ Message::encode(const std::string& value) {
 }
 
 
-Action::Action(Operation op, uint16_t tag) : _op(op), _tag(tag) { }
-Action::Action(Operation op) : Action(op, -1) { }
+ActionHeader::ActionHeader(Operation op, uint16_t tag) : _op(op), _tag(tag) { }
+ActionHeader::ActionHeader(Operation op) : ActionHeader(op, -1) { }
 void 
-Action::encode(Message& msg) const {
+ActionHeader::encode(Message& msg) const {
     msg << _op << _tag;
 }
 void 
-Action::decode(Message& msg) {
+ActionHeader::decode(Message& msg) {
     msg >> _op >> _tag;
 }
 
