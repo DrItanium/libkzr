@@ -263,6 +263,51 @@ constexpr auto ConceptualOperationToROperation = Operation::RError;
         }
     }
     class Message;
+    template<ConceptualOperation op>
+    struct RequestToTypeBinding final {
+        RequestToTypeBinding() = delete;
+        ~RequestToTypeBinding() = delete;
+        RequestToTypeBinding(const RequestToTypeBinding&) = delete;
+        RequestToTypeBinding(RequestToTypeBinding&&) = delete;
+        RequestToTypeBinding& operator=(RequestToTypeBinding&&) = delete;
+        RequestToTypeBinding& operator=(const RequestToTypeBinding&) = delete;
+    };
+#define BindRequestToType(kind, type) \
+    template<> \
+    struct RequestToTypeBinding<ConceptualOperation:: kind > final { \
+        RequestToTypeBinding() = delete; \
+        ~RequestToTypeBinding() = delete; \
+        RequestToTypeBinding(const RequestToTypeBinding&) = delete; \
+        RequestToTypeBinding(RequestToTypeBinding&&) = delete; \
+        RequestToTypeBinding& operator=(RequestToTypeBinding&&) = delete; \
+        RequestToTypeBinding& operator=(const RequestToTypeBinding&) = delete; \
+        using BoundType = type ; \
+    }
+
+    template<ConceptualOperation op>
+    struct ResponseToTypeBinding final {
+        ResponseToTypeBinding() = delete;
+        ~ResponseToTypeBinding() = delete;
+        ResponseToTypeBinding(const ResponseToTypeBinding&) = delete;
+        ResponseToTypeBinding(ResponseToTypeBinding&&) = delete;
+        ResponseToTypeBinding& operator=(ResponseToTypeBinding&&) = delete;
+        ResponseToTypeBinding& operator=(const ResponseToTypeBinding&) = delete;
+    };
+#define BindResponseToType(kind, type) \
+    template<> \
+    struct ResponseToTypeBinding<ConceptualOperation:: kind > final { \
+        ResponseToTypeBinding() = delete; \
+        ~ResponseToTypeBinding() = delete; \
+        ResponseToTypeBinding(const ResponseToTypeBinding&) = delete; \
+        ResponseToTypeBinding(ResponseToTypeBinding&&) = delete; \
+        ResponseToTypeBinding& operator=(ResponseToTypeBinding&&) = delete; \
+        ResponseToTypeBinding& operator=(const ResponseToTypeBinding&) = delete; \
+        using BoundType = type ; \
+    }
+
+#define BindRequestResponseToTypes(kind, request, response) \
+    BindRequestToType(kind, request); \
+    BindResponseToType(kind, response)
 } // end namespce kzr
 kzr::Message& operator<<(kzr::Message&, kzr::Operation);
 kzr::Message& operator>>(kzr::Message&, kzr::Operation&);

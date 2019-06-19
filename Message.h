@@ -592,6 +592,9 @@ class WStatRequest : public FixedRequest<ConceptualOperation::WStat>, public Has
 };
 using WStatResponse = FixedResponse<ConceptualOperation::WStat>;
 
+BindRequestResponseToTypes(Stat, StatRequest, StatResponse);
+BindRequestResponseToTypes(WStat, WStatRequest, WStatResponse);
+
 
 } // end namespace kzr
 
