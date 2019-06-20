@@ -53,7 +53,8 @@ using Interaction = std::variant<Response, Request>;
  * An abstract concept of working with Interactions over Connections
  */
 class Interactor {
-    public:   
+    public:
+
     private:
 
 };
