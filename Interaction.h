@@ -28,6 +28,7 @@
 #ifndef KZR_CLIENT_H__
 #define KZR_CLIENT_H__
 #include <variant>
+#include <functional>
 #include "Message.h"
 namespace kzr {
 using Response = std::variant<
@@ -46,6 +47,9 @@ KZR_PROTOCOL_KINDS
 
 /// A top level return and encoding type that client and servers send off
 using Interaction = std::variant<Response, Request>;
+
+using RecieveInteraction = std::function<Interaction()>;
+using SendInteraction = std::function<void(const Interaction&)>;
 } // end namespace kzr
 
 kzr::Message& operator<<(kzr::Message&, const kzr::Request&);
