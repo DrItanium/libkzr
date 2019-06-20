@@ -519,7 +519,6 @@ HasOffset::decode(Message& msg) {
     msg >> _offset; 
 }
 
-
 } // end namespace kzr
 
 kzr::Message& 

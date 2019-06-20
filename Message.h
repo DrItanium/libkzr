@@ -108,7 +108,7 @@ class Message {
 };
 
 /**
- * A unique identification for the given file being accessed
+ * A unique identification for the given file being accessed by the server
  */
 class Qid  {
     public:
@@ -117,8 +117,20 @@ class Qid  {
         void setType(uint8_t v) noexcept { _type = v; }
         void setVersion(uint32_t v) noexcept { _version = v; }
         void setPath(uint64_t v) noexcept { _path = v; }
+        /**
+         * Get the type of the file (such as directory, normal file, 
+         * append only file, etc)
+         */
         constexpr auto getType() const noexcept { return _type; }
+        /**
+         * Get the revision number of the file. Each modification to the file
+         * will cause the version field to be incremented.
+         */
         constexpr auto getVersion() const noexcept { return _version; }
+        /**
+         * Get the unique inode-like number that refers to this file on the file
+         * server.
+         */
         constexpr auto getPath() const noexcept { return _path; }
         void encode(Message&) const;
         void decode(Message&);
@@ -276,7 +288,13 @@ class ErrorResponse : public ResponseAction<ConceptualOperation::Error> {
         virtual ~ErrorResponse() = default;
         void encode(Message&) const override;
         void decode(Message&) override;
+        /**
+         * Get the error message
+         */
         std::string getErrorName() const noexcept { return _ename; }
+        /**
+         * Set the error message
+         */
         void setErrorName(const std::string& value) noexcept { _ename = value; }
     private:
         std::string _ename;
@@ -287,7 +305,13 @@ class VersionBody {
     public:
         void encode(Message&) const;
         void decode(Message&);
+        /**
+         * Get the string representation of the 9p protocol version
+         */
         auto getVersion() const noexcept { return _version; }
+        /**
+         * Get the total size of a message
+         */
         constexpr auto getMsize() const noexcept { return _msize; }
         void setMsize(uint16_t msize) noexcept { _msize = msize; }
         void setVersion(const std::string& value) { _version = value; }
@@ -317,21 +341,30 @@ class VersionResponse : public ResponseAction<ConceptualOperation::Version>, pub
         void decode(Message&) override;
         void setTag(uint16_t) noexcept override { }
 };
-
+/**
+ * Negotiate authentication information with the server.
+ */
 class AuthenticationRequest : public RequestAction<ConceptualOperation::Auth> {
     public:
         using Parent = RequestAction<ConceptualOperation::Auth>;
     public:
         using Parent::Parent;
         ~AuthenticationRequest() override = default;
-        constexpr auto setAttachFid() const noexcept { return _afid; }
-        void setAttachFid(uint32_t value) noexcept { _afid = value; }
-#define X(title, name) \
-        auto get ## title () const noexcept { return  name ; } \
-        void set ## title (const std::string& value ) noexcept { name  = value ; }
-        X(UserName, _uname); 
-        X(AttachName, _aname);
-#undef X
+        /**
+         * Retrieves the special authentication handle
+         */
+        constexpr auto getAuthenticationHandle() const noexcept { return _afid; }
+        void setAuthenticationHandle(uint32_t value) noexcept { _afid = value; }
+        /**
+         * Retrieve the name of the user attempting the connection
+         */
+        auto getUserName() const noexcept { return _uname; }
+        void setUserName(const std::string& value) noexcept { _uname = value; }
+        /**
+         * Retrieve the mount point the user is trying to authentication against.
+         */
+        auto getAttachName() const noexcept { return _aname; }
+        void setAttachName(const std::string& value) noexcept { _aname = value; }
         void encode(Message&) const override;
         void decode(Message&) override;
     private:
@@ -339,7 +372,9 @@ class AuthenticationRequest : public RequestAction<ConceptualOperation::Auth> {
         std::string _uname;
         std::string _aname;
 };
-
+/**
+ * Response from the server when authentication is being used, otherwise it will be an error
+ */
 class AuthenticationResponse : public ResponseAction<ConceptualOperation::Auth>, public HasQid {
     public:
         using Parent = ResponseAction<ConceptualOperation::Auth>;
@@ -366,6 +401,10 @@ class FlushRequest : public RequestAction<ConceptualOperation::Flush> {
 
 using FlushResponse = ResponseAction<ConceptualOperation::Flush>;
 
+/**
+ * Establishes a connection with the file server, the fid is a unique id selected
+ * by the client.
+ */
 class AttachRequest : public RequestAction<ConceptualOperation::Attach>, public HasFid {
     public:
         using Parent = RequestAction<ConceptualOperation::Attach>;
@@ -374,21 +413,25 @@ class AttachRequest : public RequestAction<ConceptualOperation::Attach>, public 
         ~AttachRequest() override = default;
         void encode(Message&) const override;
         void decode(Message&) override;
-#define X(title, name) \
-        constexpr auto get ## title () const noexcept { return name ; } \
-        void set ## title (uint32_t value) noexcept { name = value ; } 
-        X(AFid, _afid);
-#undef X
-#define X(title, name) \
-        auto get ## title () const noexcept { return  name ; } \
-        void set ## title (const std::string& value ) noexcept { name  = value ; }
-        X(UserName, _uname); 
-        X(AttachName, _aname);
-#undef X
+        constexpr auto getAuthenticationHandle() const noexcept { return _afid; }
+        void setAuthenticationHandle(uint32_t value) noexcept { _afid = value; }
+        /**
+         * Retrieve the name of the user attempting the connection
+         */
+        auto getUserName() const noexcept { return _uname; }
+        void setUserName(const std::string& value) noexcept { _uname = value; }
+        /**
+         * Retrieve the mount point the user is trying to authentication against.
+         */
+        auto getAttachName() const noexcept { return _aname; }
+        void setAttachName(const std::string& value) noexcept { _aname = value; }
     private:
         uint32_t _afid;
         std::string _uname, _aname;
 };
+/**
+ * Response from the server related to an attach request
+ */
 class AttachResponse : public ResponseAction<ConceptualOperation::Attach>, public HasQid {
     
     public:
@@ -401,6 +444,10 @@ class AttachResponse : public ResponseAction<ConceptualOperation::Attach>, publi
 };
 
 
+/**
+ * Serves two purposes, directory traversal and fid cloning. When the path name is
+ * is empty then it means to perform a fid clone
+ */
 class WalkRequest : public RequestAction<ConceptualOperation::Walk>, public HasFid {
     public:
         using Parent = RequestAction<ConceptualOperation:: Walk>; 
@@ -413,6 +460,8 @@ class WalkRequest : public RequestAction<ConceptualOperation::Walk>, public HasF
         const auto& getWname() const noexcept { return _wname; }
         void setNewFid(uint32_t value) noexcept { _newfid = value; }
         constexpr auto getNewFid() const noexcept { return _newfid; }
+        bool isDirectoryTraversal() const noexcept { return _wname.size() != 0; }
+        bool isFidClone() const noexcept { return !isDirectoryTraversal(); }
     private:
         uint32_t _newfid;
         std::vector<std::string> _wname;
