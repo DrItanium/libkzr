@@ -691,19 +691,6 @@ BindRequestResponseToTypes(Remove, RemoveRequest, RemoveResponse);
 BindRequestResponseToTypes(Stat, StatRequest, StatResponse);
 BindRequestResponseToTypes(WStat, WStatRequest, WStatResponse);
 
-using Response = std::variant<
-UndefinedResponse
-#define X(name, _) ,BoundResponseType<ConceptualOperation:: name >
-KZR_PROTOCOL_KINDS
-#undef X
-    >;
-
-using Request = std::variant<
-UndefinedRequest
-#define X(name, _) , BoundRequestType<ConceptualOperation:: name >
-KZR_PROTOCOL_KINDS
-#undef X
-    >;
 
 } // end namespace kzr
 
@@ -741,9 +728,5 @@ kzr::Message& operator>>(kzr::Message& msg, std::vector<T>& collec) {
     return msg;
 }
 
-kzr::Message& operator<<(kzr::Message&, const kzr::Request&);
-kzr::Message& operator>>(kzr::Message&, kzr::Request&);
-kzr::Message& operator<<(kzr::Message&, const kzr::Response&);
-kzr::Message& operator>>(kzr::Message&, kzr::Response&);
 #endif // end KZR_MESSAGE_H__
 
