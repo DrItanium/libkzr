@@ -33,7 +33,7 @@
 
 namespace kzr {
 void
-Connection::write(const Message& msg) {
+Connection::write(const MessageStream& msg) {
     // grab the string representation and construct a new string with it at the
     // front
     auto contents = msg.str();
@@ -54,7 +54,7 @@ Connection::write(const Message& msg) {
     }
 }
 void
-Connection::read(Message& msg) {
+Connection::read(MessageStream& msg) {
     // need to call rawRead twice, first to get the length, then the second
     // time to actually ingest the data
     std::string sizeAcquire(' ', 4);
@@ -83,13 +83,13 @@ Connection::read(Message& msg) {
 } // end namespace kzr
 
 kzr::Connection&
-operator<<(kzr::Connection& c, const kzr::Message& msg) {
+operator<<(kzr::Connection& c, const kzr::MessageStream& msg) {
     c.write(msg);
     return c;
 }
 
 kzr::Connection&
-operator>>(kzr::Connection& c, kzr::Message& msg) {
+operator>>(kzr::Connection& c, kzr::MessageStream& msg) {
     c.read(msg);
     return c;
 }

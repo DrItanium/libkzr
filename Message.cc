@@ -32,62 +32,62 @@
 namespace kzr {
 
 void
-Message::decode(uint8_t& out) {
+MessageStream::decode(uint8_t& out) {
     char temporaryStorage;
     _storage.get(temporaryStorage);
     out = temporaryStorage;
 }
 
 void
-Message::encode(uint8_t value) {
+MessageStream::encode(uint8_t value) {
     _storage.put(value);
 }
 
 void
-Message::decode(uint16_t& out) {
+MessageStream::decode(uint16_t& out) {
     char temporaryStorage[2];
     _storage.read(temporaryStorage, 2);
     out = build(uint8_t(temporaryStorage[0]), uint8_t(temporaryStorage[1]));
 }
 
 void
-Message::encode(uint16_t value) {
+MessageStream::encode(uint16_t value) {
     _storage.put(uint8_t(value));
     _storage.put(uint8_t(value >> 8));
 }
 
 void
-Message::decode(uint32_t& out) {
+MessageStream::decode(uint32_t& out) {
     char temporaryStorage[4];
     _storage.read(temporaryStorage, 4);
     out = build(temporaryStorage[0], temporaryStorage[1], temporaryStorage[2], temporaryStorage[3]);
 }
 
 void
-Message::encode(uint32_t value) {
+MessageStream::encode(uint32_t value) {
     encode(uint16_t(value));
     encode(uint16_t(value >> 16));
 }
 
 void
-Message::decode(uint64_t& out) {
+MessageStream::decode(uint64_t& out) {
     out = build(decode<uint32_t>(), decode<uint32_t>());
 }
 
 void
-Message::encode(uint64_t value) {
+MessageStream::encode(uint64_t value) {
     encode(uint32_t(value));
     encode(uint32_t(value >> 32));
 }
 
 void
-Message::decode(std::string& data) {
+MessageStream::decode(std::string& data) {
     auto len = decode<uint16_t>();
     data.reserve(len);
     _storage.read(data.data(), len);
 }
 void
-Message::encode(const std::string& value) {
+MessageStream::encode(const std::string& value) {
     if (uint16_t len = value.length(); len != value.length()) {
         throw kzr::Exception("Attempted to encode a string of ", value.length(), " characters when ", ((decltype(len))-1), " is the maximum allowed!");
     } else {
@@ -102,71 +102,71 @@ Message::encode(const std::string& value) {
 ActionHeader::ActionHeader(Operation op, uint16_t tag) : _op(op), _tag(tag) { }
 ActionHeader::ActionHeader(Operation op) : ActionHeader(op, -1) { }
 void 
-ActionHeader::encode(Message& msg) const {
+ActionHeader::encode(MessageStream& msg) const {
     msg << _op << _tag;
 }
 void 
-ActionHeader::decode(Message& msg) {
+ActionHeader::decode(MessageStream& msg) {
     msg >> _op >> _tag;
 }
 
 VersionRequest::VersionRequest() : Parent(notag) { }
 VersionResponse::VersionResponse() : Parent(notag) { }
 void
-VersionRequest::encode(Message& msg) const {
+VersionRequest::encode(MessageStream& msg) const {
     Parent::encode(msg);
     VersionBody::encode(msg);
 }
 void
-VersionRequest::decode(Message& msg) {
+VersionRequest::decode(MessageStream& msg) {
     Parent::decode(msg);
     VersionBody::decode(msg);
 }
 
 void
-VersionResponse::encode(Message& msg) const {
+VersionResponse::encode(MessageStream& msg) const {
     Parent::encode(msg);
     VersionBody::encode(msg);
 }
 void
-VersionResponse::decode(Message& msg) {
+VersionResponse::decode(MessageStream& msg) {
     Parent::decode(msg);
     VersionBody::decode(msg);
 }
 void
-VersionBody::encode(Message& msg) const {
+VersionBody::encode(MessageStream& msg) const {
     msg << _msize << _version;
 }
 
 void
-VersionBody::decode(Message& msg) {
+VersionBody::decode(MessageStream& msg) {
     msg >> _msize >> _version;
 }
 
 std::string
-Message::str() const { 
+MessageStream::str() const { 
     return _storage.str(); 
 }
-void Message::str(const std::string& input) { _storage.str(input); }
-void Message::reset() { _storage.str(""); }
-Message& 
-Message::operator<<(const std::string& value) {
+void MessageStream::str(const std::string& input) { _storage.str(input); }
+void MessageStream::reset() { _storage.str(""); }
+MessageStream& 
+MessageStream::operator<<(const std::string& value) {
     encode(value);
     return *this;
 }
-Message& 
-Message::operator>>(std::string& value) {
+MessageStream& 
+MessageStream::operator>>(std::string& value) {
     decode(value);
     return *this;
 }
 #define X(type) \
-        Message& \
-        Message::operator<<(type data) { \
+        MessageStream& \
+        MessageStream::operator<<(type data) { \
             encode(data); \
             return *this;  \
         } \
-        Message& \
-        Message::operator>>(type & data ) { \
+        MessageStream& \
+        MessageStream::operator>>(type & data ) { \
             decode(data); \
             return *this; \
         }
@@ -177,18 +177,18 @@ Message::operator>>(std::string& value) {
 #undef X
 
 void 
-Message::write(const std::stringstream::char_type* s, std::streamsize count) {
+MessageStream::write(const std::stringstream::char_type* s, std::streamsize count) {
     _storage.write(s, count);
     if (_storage.bad()) {
         throw kzr::Exception("bad bit set during write!");
     }
 }
 void
-Message::write(const std::string& str) {
+MessageStream::write(const std::string& str) {
     write(str.c_str(), str.length());
 }
 auto 
-Message::read(std::stringstream::char_type* s, std::streamsize count) {
+MessageStream::read(std::stringstream::char_type* s, std::streamsize count) {
     _storage.read(s, count);
     if (_storage.fail() || _storage.eof()) {
         auto total = _storage.gcount();
@@ -199,37 +199,37 @@ Message::read(std::stringstream::char_type* s, std::streamsize count) {
     }
 }
 auto 
-Message::read(std::string& str) {
+MessageStream::read(std::string& str) {
     return read(str.data(), str.length());
 }
 
 void 
-ErrorResponse::encode(Message& msg) const {
+ErrorResponse::encode(MessageStream& msg) const {
     Parent::encode(msg);
     msg << _ename;
 }
 void
-ErrorResponse::decode(Message& msg) {
+ErrorResponse::decode(MessageStream& msg) {
     Parent::decode(msg);
     msg >> _ename;
 }
 
 void
-Qid::encode(Message& msg) const {
+Qid::encode(MessageStream& msg) const {
     msg << _type << _version << _path;
 }
 
 void
-Qid::decode(Message& msg) {
+Qid::decode(MessageStream& msg) {
     msg >> _type >> _version >> _path;
 }
 
 Qid::Qid(uint8_t t, uint64_t path, uint32_t version) : _type(t), _version(version), _path(path) { }
 
 void
-Stat::encode(Message& msg) const {
+Stat::encode(MessageStream& msg) const {
     // need to construct the inner message and then tack the stat onto the front
-    Message innerMessage;
+    MessageStream innerMessage;
     innerMessage << _type << _dev;
     HasQid::encode(innerMessage);
     innerMessage << _mode
@@ -247,7 +247,7 @@ Stat::encode(Message& msg) const {
 }
 
 void
-Stat::decode(Message& msg) {
+Stat::decode(MessageStream& msg) {
     uint16_t len;
     msg >> len
         >> _type
@@ -264,99 +264,99 @@ Stat::decode(Message& msg) {
 }
 
 void
-AuthenticationRequest::encode(Message& msg) const {
+AuthenticationRequest::encode(MessageStream& msg) const {
     Parent::encode(msg);
     msg << _afid << _uname << _aname;
 }
 
 void
-AuthenticationRequest::decode(Message& msg) {
+AuthenticationRequest::decode(MessageStream& msg) {
     Parent::decode(msg);
     msg >> _afid >> _uname >> _aname;
 }
 
 void
-AuthenticationResponse::encode(Message& msg) const {
+AuthenticationResponse::encode(MessageStream& msg) const {
     Parent::encode(msg);
     HasQid::encode(msg);
 }
 void
-AuthenticationResponse::decode(Message& msg) {
+AuthenticationResponse::decode(MessageStream& msg) {
     Parent::decode(msg);
     HasQid::decode(msg);
 }
 void 
-HasQid::encode(Message& msg) const { msg << _qid; }
+HasQid::encode(MessageStream& msg) const { msg << _qid; }
 void 
-HasQid::decode(Message& msg) { msg >> _qid; }
+HasQid::decode(MessageStream& msg) { msg >> _qid; }
 void 
-HasFid::encode(Message& msg) const { msg << _fid; }
+HasFid::encode(MessageStream& msg) const { msg << _fid; }
 void 
-HasFid::decode(Message& msg) { msg >> _fid; }
+HasFid::decode(MessageStream& msg) { msg >> _fid; }
 
 void
-FlushRequest::encode(Message& msg) const {
+FlushRequest::encode(MessageStream& msg) const {
     Parent::encode(msg);
     msg << _oldtag;
 }
 void
-FlushRequest::decode(Message& msg) {
+FlushRequest::decode(MessageStream& msg) {
     Parent::decode(msg);
     msg >> _oldtag;
 }
 
 void
-AttachRequest::encode(Message& msg) const {
+AttachRequest::encode(MessageStream& msg) const {
     Parent::encode(msg);
     HasFid::encode(msg);
     msg << _afid << _uname << _aname;
 }
 void
-AttachRequest::decode(Message& msg) {
+AttachRequest::decode(MessageStream& msg) {
     Parent::decode(msg);
     HasFid::decode(msg);
     msg >> _afid >> _uname >> _aname;
 }
 
 void
-AttachResponse::encode(Message& msg) const {
+AttachResponse::encode(MessageStream& msg) const {
     Parent::encode(msg);
     HasQid::encode(msg);
 }
 void
-AttachResponse::decode(Message& msg) {
+AttachResponse::decode(MessageStream& msg) {
     Parent::decode(msg);
     HasQid::decode(msg);
 }
 
 void
-WalkRequest::encode(Message& msg) const {
+WalkRequest::encode(MessageStream& msg) const {
     Parent::encode(msg);
     HasFid::encode(msg);
     msg << _newfid << _wname;
 }
 
 void
-WalkRequest::decode(Message& msg) {
+WalkRequest::decode(MessageStream& msg) {
     Parent::decode(msg);
     HasFid::decode(msg);
     msg >> _newfid >> _wname;
 }
 
 void
-WalkResponse::encode(Message& msg) const {
+WalkResponse::encode(MessageStream& msg) const {
     Parent::encode(msg);
     msg << _wqid;
 }
 
 void
-WalkResponse::decode(Message& msg) {
+WalkResponse::decode(MessageStream& msg) {
     Parent::decode(msg);
     msg >> _wqid;
 }
 
 std::optional<uint8_t>
-Message::peek() noexcept {
+MessageStream::peek() noexcept {
     if (auto result = _storage.peek(); result != _storage.eof()) {
         return std::optional<uint8_t>(uint8_t(result));
     } else {
@@ -365,21 +365,21 @@ Message::peek() noexcept {
 }
 
 void
-OpenRequest::encode(Message& msg) const {
+OpenRequest::encode(MessageStream& msg) const {
     Parent::encode(msg);
     HasFid::encode(msg);
     msg << _mode;
 }
 
 void
-OpenRequest::decode(Message& msg) {
+OpenRequest::decode(MessageStream& msg) {
     Parent::decode(msg);
     HasFid::decode(msg);
     msg >> _mode;
 }
 
 void
-CreateRequest::encode(Message& msg) const {
+CreateRequest::encode(MessageStream& msg) const {
     Parent::encode(msg);
     HasFid::encode(msg);
     HasName::encode(msg);
@@ -387,7 +387,7 @@ CreateRequest::encode(Message& msg) const {
 }
 
 void
-CreateRequest::decode(Message& msg) {
+CreateRequest::decode(MessageStream& msg) {
     Parent::decode(msg);
     HasFid::decode(msg);
     HasName::decode(msg);
@@ -395,80 +395,80 @@ CreateRequest::decode(Message& msg) {
 }
 
 void
-ReadRequest::encode(Message& msg) const {
+ReadRequest::encode(MessageStream& msg) const {
     Parent::encode(msg);
     HasCount::encode(msg);
 }
 
 void
-ReadRequest::decode(Message& msg) {
+ReadRequest::decode(MessageStream& msg) {
     Parent::decode(msg);
     HasCount::decode(msg);
 }
 
 void
-ReadResponse::encode(Message& msg) const {
+ReadResponse::encode(MessageStream& msg) const {
     Parent::encode(msg);
     HasDataStorage::encode(msg);
 }
 
 void
-ReadResponse::decode(Message& msg) {
+ReadResponse::decode(MessageStream& msg) {
     Parent::decode(msg);
     HasDataStorage::decode(msg);
 }
 
 void
-WriteRequest::encode(Message& msg) const {
+WriteRequest::encode(MessageStream& msg) const {
     Parent::encode(msg);
     HasDataStorage::encode(msg);
 }
 
 void
-WriteRequest::decode(Message& msg) {
+WriteRequest::decode(MessageStream& msg) {
     Parent::decode(msg);
     HasDataStorage::decode(msg);
 }
 
 void
-WriteResponse::encode(Message& msg) const {
+WriteResponse::encode(MessageStream& msg) const {
     Parent::encode(msg);
     HasCount::encode(msg);
 }
 
 void
-WriteResponse::decode(Message& msg) {
+WriteResponse::decode(MessageStream& msg) {
     Parent::decode(msg);
     HasCount::decode(msg);
 }
 
 void
-StatResponse::encode(Message& msg) const {
+StatResponse::encode(MessageStream& msg) const {
     Parent::encode(msg);
     msg << _data;
 }
 
 void
-StatResponse::decode(Message& msg) {
+StatResponse::decode(MessageStream& msg) {
     Parent::decode(msg);
     msg >> _data;
 }
 
 void
-WStatRequest::encode(Message& msg) const {
+WStatRequest::encode(MessageStream& msg) const {
     Parent::encode(msg);
     HasFid::encode(msg);
     msg << _stat;
 }
 void
-WStatRequest::decode(Message& msg) {
+WStatRequest::decode(MessageStream& msg) {
     Parent::decode(msg);
     HasFid::decode(msg);
     msg >> _stat;
 }
 
 void
-HasDataStorage::encode(Message& msg) const {
+HasDataStorage::encode(MessageStream& msg) const {
     if (uint32_t len = size(); len != size()) {
         throw Exception("data storage too large for transmission");
     } else {
@@ -480,7 +480,7 @@ HasDataStorage::encode(Message& msg) const {
 }
 
 void
-HasDataStorage::decode(Message& msg) {
+HasDataStorage::decode(MessageStream& msg) {
     uint32_t size;
     msg >> size;
     _data.reserve(size);
@@ -490,32 +490,32 @@ HasDataStorage::decode(Message& msg) {
 }
 
 void
-HasName::encode(Message& msg) const {
+HasName::encode(MessageStream& msg) const {
     msg << _name; 
 }
 
 void
-HasName::decode(Message& msg) {
+HasName::decode(MessageStream& msg) {
     msg >> _name; 
 }
 
 void
-HasCount::encode(Message& msg) const {
+HasCount::encode(MessageStream& msg) const {
     msg << _count; 
 }
 
 void
-HasCount::decode(Message& msg) {
+HasCount::decode(MessageStream& msg) {
     msg >> _count; 
 }
 
 void
-HasOffset::encode(Message& msg) const {
+HasOffset::encode(MessageStream& msg) const {
     msg << _offset; 
 }
 
 void
-HasOffset::decode(Message& msg) {
+HasOffset::decode(MessageStream& msg) {
     msg >> _offset; 
 }
 

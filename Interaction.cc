@@ -26,18 +26,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "Interaction.h"
-kzr::Message& 
-operator<<(kzr::Message& msg, const kzr::Request& request) {
+kzr::MessageStream& 
+operator<<(kzr::MessageStream& msg, const kzr::Request& request) {
     std::visit([&msg](auto&& value) { msg << value; }, request);
     return msg;
 }
-kzr::Message& 
-operator<<(kzr::Message& msg, const kzr::Response& request) {
+kzr::MessageStream& 
+operator<<(kzr::MessageStream& msg, const kzr::Response& request) {
     std::visit([&msg](auto&& value) { msg << value; }, request);
     return msg;
 }
-kzr::Message& 
-operator>>(kzr::Message& msg, kzr::Request& request) {
+kzr::MessageStream& 
+operator>>(kzr::MessageStream& msg, kzr::Request& request) {
     // decoding is a bit harder actually, we have to figure out the type first and emplace that into memory
     if (auto op = msg.peek(); op) {
         switch (convert(kzr::Operation(*op))) {
@@ -57,8 +57,8 @@ operator>>(kzr::Message& msg, kzr::Request& request) {
     }
 }
 
-kzr::Message& 
-operator>>(kzr::Message& msg, kzr::Response& request) {
+kzr::MessageStream& 
+operator>>(kzr::MessageStream& msg, kzr::Response& request) {
     // decoding is a bit harder actually, we have to figure out the type first and emplace that into memory
     if (auto op = msg.peek(); op) {
         switch (convert(kzr::Operation(*op))) {
@@ -78,13 +78,13 @@ operator>>(kzr::Message& msg, kzr::Response& request) {
     }
 }
 
-kzr::Message&
-operator<<(kzr::Message& msg, const kzr::Interaction& thing) {
+kzr::MessageStream&
+operator<<(kzr::MessageStream& msg, const kzr::Interaction& thing) {
     std::visit([&msg](auto&& value) { msg << value; }, thing); 
     return msg;
 }
-kzr::Message&
-operator>>(kzr::Message& msg, kzr::Interaction& thing) {
+kzr::MessageStream&
+operator>>(kzr::MessageStream& msg, kzr::Interaction& thing) {
     if (auto op = msg.peek(); op) {
         if (auto lookup = kzr::Operation(*op); kzr::isRequest(lookup)) {
             thing.emplace<kzr::Request>();

@@ -169,7 +169,7 @@ KZR_PROTOCOL_KINDS
             }
         }
     }
-    class Message;
+    class MessageStream;
     template<ConceptualOperation op>
     struct RequestToTypeBinding final {
         RequestToTypeBinding() = delete;
@@ -222,6 +222,6 @@ using BoundRequestType = typename RequestToTypeBinding<op>::BoundType;
 template<ConceptualOperation op>
 using BoundResponseType = typename ResponseToTypeBinding<op>::BoundType;
 } // end namespce kzr
-kzr::Message& operator<<(kzr::Message&, kzr::Operation);
-kzr::Message& operator>>(kzr::Message&, kzr::Operation&);
+kzr::MessageStream& operator<<(kzr::MessageStream&, kzr::Operation);
+kzr::MessageStream& operator>>(kzr::MessageStream&, kzr::Operation&);
 #endif // end KZR_OPERATIONS_H__

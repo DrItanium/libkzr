@@ -52,10 +52,10 @@ using RecieveInteraction = std::function<Interaction()>;
 using SendInteraction = std::function<void(const Interaction&)>;
 } // end namespace kzr
 
-kzr::Message& operator<<(kzr::Message&, const kzr::Request&);
-kzr::Message& operator>>(kzr::Message&, kzr::Request&);
-kzr::Message& operator<<(kzr::Message&, const kzr::Response&);
-kzr::Message& operator>>(kzr::Message&, kzr::Response&);
-kzr::Message& operator<<(kzr::Message&, const kzr::Interaction&);
-kzr::Message& operator>>(kzr::Message&, kzr::Interaction&);
+kzr::MessageStream& operator<<(kzr::MessageStream&, const kzr::Request&);
+kzr::MessageStream& operator>>(kzr::MessageStream&, kzr::Request&);
+kzr::MessageStream& operator<<(kzr::MessageStream&, const kzr::Response&);
+kzr::MessageStream& operator>>(kzr::MessageStream&, kzr::Response&);
+kzr::MessageStream& operator<<(kzr::MessageStream&, const kzr::Interaction&);
+kzr::MessageStream& operator>>(kzr::MessageStream&, kzr::Interaction&);
 #endif // end KZR_CLIENT_H__

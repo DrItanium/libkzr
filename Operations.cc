@@ -31,16 +31,16 @@
 #include "Exception.h"
 
 
-kzr::Message&
-operator>>(kzr::Message& in, kzr::Operation& op) {
+kzr::MessageStream&
+operator>>(kzr::MessageStream& in, kzr::Operation& op) {
     uint8_t temp;
     in.decode(temp);
     op = static_cast<kzr::Operation>(temp);
     return in;
 }
 
-kzr::Message&
-operator<<(kzr::Message& msg, kzr::Operation op) {
+kzr::MessageStream&
+operator<<(kzr::MessageStream& msg, kzr::Operation op) {
     msg.encode(uint8_t(op)); 
     return msg;
 }

@@ -38,8 +38,8 @@ namespace kzr {
 class Connection {
     public:
         virtual ~Connection() = default;
-        void write(const Message&);
-        void read(Message&);
+        void write(const MessageStream&);
+        void read(MessageStream&);
     protected:
         [[nodiscard]] virtual size_t rawWrite(const std::string& data) = 0;
         [[nodiscard]] virtual size_t rawRead(std::string& data) = 0;
@@ -47,7 +47,7 @@ class Connection {
 
 } // end namespace kzr
 
-kzr::Connection& operator<<(kzr::Connection&, const kzr::Message&);
-kzr::Connection& operator>>(kzr::Connection&, kzr::Message&);
+kzr::Connection& operator<<(kzr::Connection&, const kzr::MessageStream&);
+kzr::Connection& operator>>(kzr::Connection&, kzr::MessageStream&);
 
 #endif // end KZR_CONNECTION_H__
