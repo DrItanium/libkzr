@@ -30,6 +30,7 @@
 #include <variant>
 #include <functional>
 #include "Message.h"
+#include "Connection.h"
 namespace kzr {
 using Response = std::variant<
 UndefinedResponse
@@ -48,8 +49,14 @@ KZR_PROTOCOL_KINDS
 /// A top level return and encoding type that client and servers send off
 using Interaction = std::variant<Response, Request>;
 
-using RecieveInteraction = std::function<Interaction()>;
-using SendInteraction = std::function<void(const Interaction&)>;
+/**
+ * An abstract concept of working with Interactions over Connections
+ */
+class Interactor {
+    public:   
+    private:
+
+};
 } // end namespace kzr
 
 kzr::Message& operator<<(kzr::Message&, const kzr::Request&);
