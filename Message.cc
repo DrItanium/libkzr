@@ -33,14 +33,14 @@ namespace kzr {
 
 
 
-ActionHeader::ActionHeader(Operation op, uint16_t tag) : _op(op), _tag(tag) { }
-ActionHeader::ActionHeader(Operation op) : ActionHeader(op, -1) { }
+MessageHeader::MessageHeader(Operation op, uint16_t tag) : _op(op), _tag(tag) { }
+MessageHeader::MessageHeader(Operation op) : MessageHeader(op, -1) { }
 void 
-ActionHeader::encode(MessageStream& msg) const {
+MessageHeader::encode(MessageStream& msg) const {
     msg << _op << _tag;
 }
 void 
-ActionHeader::decode(MessageStream& msg) {
+MessageHeader::decode(MessageStream& msg) {
     msg >> _op >> _tag;
 }
 

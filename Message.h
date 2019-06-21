@@ -144,11 +144,11 @@ class HasFid {
  * Holds the arguments of a request by the client or a response by the server;
  * This top level class contains the elements common to all message kinds
  */
-class ActionHeader {
+class MessageHeader {
     public:
-        explicit ActionHeader(Operation op);
-        ActionHeader(Operation op, uint16_t tag);
-        virtual ~ActionHeader() = default;
+        explicit MessageHeader(Operation op);
+        MessageHeader(Operation op, uint16_t tag);
+        virtual ~MessageHeader() = default;
         constexpr auto getTag() const noexcept { return _tag; }
         virtual void setTag(uint16_t value) noexcept { _tag = value; }
         virtual void encode(MessageStream& msg) const;
@@ -163,34 +163,34 @@ class ActionHeader {
         uint16_t _tag;
 };
 template<Operation op>
-class Action : public ActionHeader {
+class Message : public MessageHeader {
     public:
-        using Parent = ActionHeader;
+        using Parent = MessageHeader;
     public:
-        Action() : Parent(op) { }
-        explicit Action(uint16_t tag) : Parent(op, tag) { }
-        ~Action() override = default;
+        Message() : Parent(op) { }
+        explicit Message(uint16_t tag) : Parent(op, tag) { }
+        ~Message() override = default;
 };
 template<ConceptualOperation op>
-class ResponseAction : public Action<getRMessageForm(op)> {
+class ResponseMessage : public Message<getRMessageForm(op)> {
     public:
-        using Parent = Action<getRMessageForm(op)>;
+        using Parent = Message<getRMessageForm(op)>;
     public:
         using Parent::Parent;
-        ~ResponseAction() override = default;
+        ~ResponseMessage() override = default;
 };
 template<ConceptualOperation op>
-class RequestAction : public Action<getTMessageForm(op)> {
+class RequestMessage : public Message<getTMessageForm(op)> {
     public:
-        using Parent = Action<getTMessageForm(op)>;
+        using Parent = Message<getTMessageForm(op)>;
     public:
         using Parent::Parent;
-        ~RequestAction() override = default;
+        ~RequestMessage() override = default;
 };
 
-class UndefinedResponse final : public Action<Operation::RBad> {
+class UndefinedResponse final : public Message<Operation::RBad> {
     public:
-        using Parent = Action<Operation::RBad>;
+        using Parent = Message<Operation::RBad>;
     public:
         using Parent::Parent;
         ~UndefinedResponse() override = default;
@@ -202,9 +202,9 @@ class UndefinedResponse final : public Action<Operation::RBad> {
         }
 };
 
-class UndefinedRequest final : public Action<Operation::TBad> {
+class UndefinedRequest final : public Message<Operation::TBad> {
     public:
-        using Parent = Action<Operation::TBad>;
+        using Parent = Message<Operation::TBad>;
     public:
         using Parent::Parent;
         ~UndefinedRequest() override = default;
@@ -215,9 +215,9 @@ class UndefinedRequest final : public Action<Operation::TBad> {
             throw Exception("Undefined request!");
         }
 };
-class ErrorResponse : public ResponseAction<ConceptualOperation::Error> {
+class ErrorResponse : public ResponseMessage<ConceptualOperation::Error> {
     public:
-        using Parent = ResponseAction<ConceptualOperation::Error>;
+        using Parent = ResponseMessage<ConceptualOperation::Error>;
     public:
         using Parent::Parent;
         virtual ~ErrorResponse() = default;
@@ -235,7 +235,7 @@ class ErrorResponse : public ResponseAction<ConceptualOperation::Error> {
         std::string _ename;
 };
 // Requesting errors does not make sense but this is here for regularity
-using ErrorRequest = RequestAction<ConceptualOperation::Error>;
+using ErrorRequest = RequestMessage<ConceptualOperation::Error>;
 class VersionBody {
     public:
         void encode(MessageStream&) const;
@@ -255,9 +255,9 @@ class VersionBody {
         uint16_t _msize;
 
 };
-class VersionRequest : public RequestAction<ConceptualOperation::Version>, public VersionBody {
+class VersionRequest : public RequestMessage<ConceptualOperation::Version>, public VersionBody {
     public:
-        using Parent = RequestAction<ConceptualOperation::Version>;
+        using Parent = RequestMessage<ConceptualOperation::Version>;
     public:
         VersionRequest();
         ~VersionRequest() override = default;
@@ -266,9 +266,9 @@ class VersionRequest : public RequestAction<ConceptualOperation::Version>, publi
         void setTag(uint16_t) noexcept override { }
 };
 
-class VersionResponse : public ResponseAction<ConceptualOperation::Version>, public VersionBody {
+class VersionResponse : public ResponseMessage<ConceptualOperation::Version>, public VersionBody {
     public:
-        using Parent = ResponseAction<ConceptualOperation::Version>;
+        using Parent = ResponseMessage<ConceptualOperation::Version>;
     public:
         VersionResponse();
         ~VersionResponse() override = default;
@@ -279,9 +279,9 @@ class VersionResponse : public ResponseAction<ConceptualOperation::Version>, pub
 /**
  * Negotiate authentication information with the server.
  */
-class AuthenticationRequest : public RequestAction<ConceptualOperation::Auth> {
+class AuthenticationRequest : public RequestMessage<ConceptualOperation::Auth> {
     public:
-        using Parent = RequestAction<ConceptualOperation::Auth>;
+        using Parent = RequestMessage<ConceptualOperation::Auth>;
     public:
         using Parent::Parent;
         ~AuthenticationRequest() override = default;
@@ -310,9 +310,9 @@ class AuthenticationRequest : public RequestAction<ConceptualOperation::Auth> {
 /**
  * Response from the server when authentication is being used, otherwise it will be an error
  */
-class AuthenticationResponse : public ResponseAction<ConceptualOperation::Auth>, public HasQid {
+class AuthenticationResponse : public ResponseMessage<ConceptualOperation::Auth>, public HasQid {
     public:
-        using Parent = ResponseAction<ConceptualOperation::Auth>;
+        using Parent = ResponseMessage<ConceptualOperation::Auth>;
     public:
         using Parent::Parent;
         ~AuthenticationResponse() override = default;
@@ -320,9 +320,9 @@ class AuthenticationResponse : public ResponseAction<ConceptualOperation::Auth>,
         void decode(MessageStream&) override;
 };
 
-class FlushRequest : public RequestAction<ConceptualOperation::Flush> {
+class FlushRequest : public RequestMessage<ConceptualOperation::Flush> {
     public:
-        using Parent = RequestAction<ConceptualOperation::Flush>;
+        using Parent = RequestMessage<ConceptualOperation::Flush>;
     public:
         using Parent::Parent;
         ~FlushRequest() override = default;
@@ -334,15 +334,15 @@ class FlushRequest : public RequestAction<ConceptualOperation::Flush> {
         uint16_t _oldtag;
 };
 
-using FlushResponse = ResponseAction<ConceptualOperation::Flush>;
+using FlushResponse = ResponseMessage<ConceptualOperation::Flush>;
 
 /**
  * Establishes a connection with the file server, the fid is a unique id selected
  * by the client.
  */
-class AttachRequest : public RequestAction<ConceptualOperation::Attach>, public HasFid {
+class AttachRequest : public RequestMessage<ConceptualOperation::Attach>, public HasFid {
     public:
-        using Parent = RequestAction<ConceptualOperation::Attach>;
+        using Parent = RequestMessage<ConceptualOperation::Attach>;
     public:
         using Parent::Parent;
         ~AttachRequest() override = default;
@@ -367,10 +367,10 @@ class AttachRequest : public RequestAction<ConceptualOperation::Attach>, public 
 /**
  * Response from the server related to an attach request
  */
-class AttachResponse : public ResponseAction<ConceptualOperation::Attach>, public HasQid {
+class AttachResponse : public ResponseMessage<ConceptualOperation::Attach>, public HasQid {
     
     public:
-        using Parent = ResponseAction<ConceptualOperation::Attach>;
+        using Parent = ResponseMessage<ConceptualOperation::Attach>;
     public:
         using Parent::Parent;
         ~AttachResponse() override = default;
@@ -383,9 +383,9 @@ class AttachResponse : public ResponseAction<ConceptualOperation::Attach>, publi
  * Serves two purposes, directory traversal and fid cloning. When the path name is
  * is empty then it means to perform a fid clone
  */
-class WalkRequest : public RequestAction<ConceptualOperation::Walk>, public HasFid {
+class WalkRequest : public RequestMessage<ConceptualOperation::Walk>, public HasFid {
     public:
-        using Parent = RequestAction<ConceptualOperation:: Walk>; 
+        using Parent = RequestMessage<ConceptualOperation:: Walk>; 
     public: 
         using Parent::Parent; 
         ~ WalkRequest () override = default ; 
@@ -402,9 +402,9 @@ class WalkRequest : public RequestAction<ConceptualOperation::Walk>, public HasF
         std::vector<std::string> _wname;
 };
 
-class WalkResponse : public ResponseAction<ConceptualOperation::Walk> {
+class WalkResponse : public ResponseMessage<ConceptualOperation::Walk> {
     public:
-        using Parent = ResponseAction<ConceptualOperation:: Walk>; 
+        using Parent = ResponseMessage<ConceptualOperation:: Walk>; 
     public: 
         using Parent::Parent; 
         ~ WalkResponse () override = default ; 
@@ -416,9 +416,9 @@ class WalkResponse : public ResponseAction<ConceptualOperation::Walk> {
         std::vector<Qid> _wqid;
 };
 
-class OpenRequest : public RequestAction<ConceptualOperation::Open>, public HasFid {
+class OpenRequest : public RequestMessage<ConceptualOperation::Open>, public HasFid {
     public:
-        using Parent = RequestAction<ConceptualOperation:: Open>; 
+        using Parent = RequestMessage<ConceptualOperation:: Open>; 
     public: 
         using Parent::Parent; 
         ~OpenRequest() override = default ; 
@@ -431,11 +431,11 @@ class OpenRequest : public RequestAction<ConceptualOperation::Open>, public HasF
 };
 
 template<ConceptualOperation op>
-class OpenOrCreateResponse : public ResponseAction<op>, public HasQid {
+class OpenOrCreateResponse : public ResponseMessage<op>, public HasQid {
     public:
         static_assert(op == ConceptualOperation::Create ||
                       op == ConceptualOperation::Open, "Illegal OpenOrCreateResponse kind!");
-        using Parent = ResponseAction<op>;
+        using Parent = ResponseMessage<op>;
     public:
         using Parent::Parent;
         ~OpenOrCreateResponse() override = default;
@@ -456,9 +456,9 @@ class OpenOrCreateResponse : public ResponseAction<op>, public HasQid {
 
 };
 using OpenResponse = OpenOrCreateResponse<ConceptualOperation::Open>;
-class CreateRequest : public RequestAction<ConceptualOperation::Create>, public HasFid, public HasName {
+class CreateRequest : public RequestMessage<ConceptualOperation::Create>, public HasFid, public HasName {
     public:
-        using Parent = RequestAction<ConceptualOperation:: Create>; 
+        using Parent = RequestMessage<ConceptualOperation:: Create>; 
     public: 
         using Parent::Parent; 
         ~CreateRequest() override = default ; 
@@ -476,9 +476,9 @@ class CreateRequest : public RequestAction<ConceptualOperation::Create>, public 
 using CreateResponse = OpenOrCreateResponse<ConceptualOperation::Create>;
 
 template<ConceptualOperation op>
-class FidRequest : public RequestAction<op>, public HasFid {
+class FidRequest : public RequestMessage<op>, public HasFid {
     public:
-        using Parent = RequestAction<op>;
+        using Parent = RequestMessage<op>;
     public:
         using Parent::Parent;
         ~FidRequest() override = default;
@@ -546,9 +546,9 @@ class ReadRequest : public ReadWriteRequest<ConceptualOperation::Read>, public H
         void decode(MessageStream& msg) override;
 };
 
-class ReadResponse : public ResponseAction<ConceptualOperation::Read>, public HasDataStorage {
+class ReadResponse : public ResponseMessage<ConceptualOperation::Read>, public HasDataStorage {
     public:
-        using Parent = ResponseAction<ConceptualOperation::Read>;
+        using Parent = ResponseMessage<ConceptualOperation::Read>;
     public:
         using Parent::Parent;
         ~ReadResponse() override = default;
@@ -566,9 +566,9 @@ class WriteRequest : public ReadWriteRequest<ConceptualOperation::Write>, public
         void decode(MessageStream&) override;
 };
 
-class WriteResponse : public ResponseAction<ConceptualOperation::Write>, public HasCount {
+class WriteResponse : public ResponseMessage<ConceptualOperation::Write>, public HasCount {
     public:
-        using Parent = ResponseAction<ConceptualOperation::Write>;
+        using Parent = ResponseMessage<ConceptualOperation::Write>;
     public:
         using Parent::Parent;
         ~WriteResponse() override = default;
@@ -577,13 +577,13 @@ class WriteResponse : public ResponseAction<ConceptualOperation::Write>, public 
 };
 
 using ClunkRequest = FidRequest<ConceptualOperation::Clunk>;
-using ClunkResponse = ResponseAction<ConceptualOperation::Clunk>;
+using ClunkResponse = ResponseMessage<ConceptualOperation::Clunk>;
 using RemoveRequest = FidRequest<ConceptualOperation::Remove>;
-using RemoveResponse = ResponseAction<ConceptualOperation::Remove>;
+using RemoveResponse = ResponseMessage<ConceptualOperation::Remove>;
 using StatRequest = FidRequest<ConceptualOperation::Stat>;
-class StatResponse : public ResponseAction<ConceptualOperation::Stat> {
+class StatResponse : public ResponseMessage<ConceptualOperation::Stat> {
     public:
-        using Parent = ResponseAction<ConceptualOperation::Stat>;
+        using Parent = ResponseMessage<ConceptualOperation::Stat>;
     public:
         using Parent::Parent;
         ~StatResponse() override = default;
@@ -595,9 +595,9 @@ class StatResponse : public ResponseAction<ConceptualOperation::Stat> {
     private:
         std::string _data;
 };
-class WStatRequest : public RequestAction<ConceptualOperation::WStat>, public HasFid {
+class WStatRequest : public RequestMessage<ConceptualOperation::WStat>, public HasFid {
     public:
-        using Parent = RequestAction<ConceptualOperation::WStat>;
+        using Parent = RequestMessage<ConceptualOperation::WStat>;
     public:
         using Parent::Parent;
         ~WStatRequest() override = default;
@@ -609,7 +609,7 @@ class WStatRequest : public RequestAction<ConceptualOperation::WStat>, public Ha
     private:
         Stat _stat;
 };
-using WStatResponse = ResponseAction<ConceptualOperation::WStat>;
+using WStatResponse = ResponseMessage<ConceptualOperation::WStat>;
 
 BindRequestResponseToTypes(Error, ErrorRequest, ErrorResponse);
 BindRequestResponseToTypes(Version, VersionRequest, VersionResponse);
