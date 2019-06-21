@@ -27,77 +27,10 @@
  */
 
 #include "Message.h"
-#include "MessageStream.h"
 #include "Exception.h"
 
 namespace kzr {
 
-void
-MessageStream::decode(uint8_t& out) {
-    char temporaryStorage;
-    _storage.get(temporaryStorage);
-    out = temporaryStorage;
-}
-
-void
-MessageStream::encode(uint8_t value) {
-    _storage.put(value);
-}
-
-void
-MessageStream::decode(uint16_t& out) {
-    char temporaryStorage[2];
-    _storage.read(temporaryStorage, 2);
-    out = build(uint8_t(temporaryStorage[0]), uint8_t(temporaryStorage[1]));
-}
-
-void
-MessageStream::encode(uint16_t value) {
-    _storage.put(uint8_t(value));
-    _storage.put(uint8_t(value >> 8));
-}
-
-void
-MessageStream::decode(uint32_t& out) {
-    char temporaryStorage[4];
-    _storage.read(temporaryStorage, 4);
-    out = build(temporaryStorage[0], temporaryStorage[1], temporaryStorage[2], temporaryStorage[3]);
-}
-
-void
-MessageStream::encode(uint32_t value) {
-    encode(uint16_t(value));
-    encode(uint16_t(value >> 16));
-}
-
-void
-MessageStream::decode(uint64_t& out) {
-    out = build(decode<uint32_t>(), decode<uint32_t>());
-}
-
-void
-MessageStream::encode(uint64_t value) {
-    encode(uint32_t(value));
-    encode(uint32_t(value >> 32));
-}
-
-void
-MessageStream::decode(std::string& data) {
-    auto len = decode<uint16_t>();
-    data.reserve(len);
-    _storage.read(data.data(), len);
-}
-void
-MessageStream::encode(const std::string& value) {
-    if (uint16_t len = value.length(); len != value.length()) {
-        throw kzr::Exception("Attempted to encode a string of ", value.length(), " characters when ", ((decltype(len))-1), " is the maximum allowed!");
-    } else {
-        encode(len);
-        for (const auto& c : value) {
-            encode(uint8_t(c));
-        }
-    }
-}
 
 
 ActionHeader::ActionHeader(Operation op, uint16_t tag) : _op(op), _tag(tag) { }
@@ -144,65 +77,6 @@ VersionBody::decode(MessageStream& msg) {
     msg >> _msize >> _version;
 }
 
-std::string
-MessageStream::str() const { 
-    return _storage.str(); 
-}
-void MessageStream::str(const std::string& input) { _storage.str(input); }
-void MessageStream::reset() { _storage.str(""); }
-MessageStream& 
-MessageStream::operator<<(const std::string& value) {
-    encode(value);
-    return *this;
-}
-MessageStream& 
-MessageStream::operator>>(std::string& value) {
-    decode(value);
-    return *this;
-}
-#define X(type) \
-        MessageStream& \
-        MessageStream::operator<<(type data) { \
-            encode(data); \
-            return *this;  \
-        } \
-        MessageStream& \
-        MessageStream::operator>>(type & data ) { \
-            decode(data); \
-            return *this; \
-        }
-        X(uint8_t);
-        X(uint16_t);
-        X(uint32_t);
-        X(uint64_t);
-#undef X
-
-void 
-MessageStream::write(const std::stringstream::char_type* s, std::streamsize count) {
-    _storage.write(s, count);
-    if (_storage.bad()) {
-        throw kzr::Exception("bad bit set during write!");
-    }
-}
-void
-MessageStream::write(const std::string& str) {
-    write(str.c_str(), str.length());
-}
-auto 
-MessageStream::read(std::stringstream::char_type* s, std::streamsize count) {
-    _storage.read(s, count);
-    if (_storage.fail() || _storage.eof()) {
-        auto total = _storage.gcount();
-        _storage.clear(); // clear flags right now
-        return total;
-    } else {
-        return count;
-    }
-}
-auto 
-MessageStream::read(std::string& str) {
-    return read(str.data(), str.length());
-}
 
 void 
 ErrorResponse::encode(MessageStream& msg) const {
@@ -356,14 +230,6 @@ WalkResponse::decode(MessageStream& msg) {
     msg >> _wqid;
 }
 
-std::optional<uint8_t>
-MessageStream::peek() noexcept {
-    if (auto result = _storage.peek(); result != _storage.eof()) {
-        return std::optional<uint8_t>(uint8_t(result));
-    } else {
-        return std::nullopt;
-    }
-}
 
 void
 OpenRequest::encode(MessageStream& msg) const {

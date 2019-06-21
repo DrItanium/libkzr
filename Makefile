@@ -12,7 +12,8 @@ LIBKZR_CORE_OBJS := Message.o \
 	FileHandleConnection.o \
 	SocketConnection.o \
 	UnixDomainSocketConnection.o \
-	Interaction.o
+	Interaction.o \
+	MessageStream.o
 
 LIBKZR_ARCHIVE := libkzr.a
 
@@ -57,6 +58,8 @@ FileHandleConnection.o: FileHandleConnection.cc FileHandleConnection.h \
 Interaction.o: Interaction.cc Interaction.h Message.h Operations.h \
  Exception.h MessageStream.h
 Message.o: Message.cc Message.h Operations.h Exception.h MessageStream.h
+MessageStream.o: MessageStream.cc MessageStream.h Operations.h \
+ Exception.h
 Operations.o: Operations.cc Operations.h Message.h Exception.h \
  MessageStream.h
 SocketConnection.o: SocketConnection.cc SocketConnection.h \
