@@ -134,8 +134,7 @@ kzr::MessageStream& operator<<(kzr::MessageStream& msg, const std::vector<T>& co
 
 template<typename T>
 kzr::MessageStream& operator>>(kzr::MessageStream& msg, std::vector<T>& collec) {
-    uint16_t len;
-    msg >> len;
+    auto len = msg.decode<uint16_t>();
     for (auto i = 0; i < len; ++i) {
         collec.emplace_back();
         msg >> collec.back();
