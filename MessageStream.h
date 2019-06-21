@@ -55,6 +55,7 @@ constexpr uint32_t build(uint8_t lowest, uint8_t lower, uint8_t high, uint8_t hi
 constexpr uint64_t build(uint32_t lower, uint32_t upper) noexcept {
     return (uint64_t(upper) << 32) | uint64_t(lower);
 }
+
 /**
  * A memory stream used to encode and decode messages
  */
