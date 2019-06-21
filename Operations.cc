@@ -27,7 +27,7 @@
  */
 
 #include "Operations.h"
-#include "Message.h" // need some of the other encode operations
+#include "MessageStream.h" // need some of the other encode operations
 #include "Exception.h"
 
 
