@@ -160,14 +160,10 @@ AuthenticationResponse::decode(MessageStream& msg) {
     Parent::decode(msg);
     HasQid::decode(msg);
 }
-void 
-HasQid::encode(MessageStream& msg) const { msg << _qid; }
-void 
-HasQid::decode(MessageStream& msg) { msg >> _qid; }
-void 
-HasFid::encode(MessageStream& msg) const { msg << _fid; }
-void 
-HasFid::decode(MessageStream& msg) { msg >> _fid; }
+void HasQid::encode(MessageStream& msg) const { msg << _qid; }
+void HasQid::decode(MessageStream& msg) { msg >> _qid; }
+void HasFid::encode(MessageStream& msg) const { msg << _fid; }
+void HasFid::decode(MessageStream& msg) { msg >> _fid; }
 
 void
 FlushRequest::encode(MessageStream& msg) const {
@@ -348,8 +344,7 @@ HasDataStorage::encode(MessageStream& msg) const {
 
 void
 HasDataStorage::decode(MessageStream& msg) {
-    uint32_t size;
-    msg >> size;
+    auto size = msg.decode<uint32_t>();
     _data.reserve(size);
     for (decltype(size) i = 0; i < size; ++i) {
         _data.emplace_back(msg.decode<uint8_t>());
@@ -364,26 +359,6 @@ HasName::encode(MessageStream& msg) const {
 void
 HasName::decode(MessageStream& msg) {
     msg >> _name; 
-}
-
-void
-HasCount::encode(MessageStream& msg) const {
-    msg << _count; 
-}
-
-void
-HasCount::decode(MessageStream& msg) {
-    msg >> _count; 
-}
-
-void
-HasOffset::encode(MessageStream& msg) const {
-    msg << _offset; 
-}
-
-void
-HasOffset::decode(MessageStream& msg) {
-    msg >> _offset; 
 }
 
 } // end namespace kzr

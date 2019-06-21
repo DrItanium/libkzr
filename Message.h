@@ -496,8 +496,8 @@ class HasCount {
     public:
         constexpr auto getCount() const noexcept { return _count; }
         void setCount(uint32_t v) noexcept { _count = v; }
-        void encode(MessageStream& msg) const;
-        void decode(MessageStream& msg);
+        void encode(MessageStream& msg) const { msg << _count; }
+        void decode(MessageStream& msg) { msg >> _count; }
     private:
         uint32_t _count;
 };
@@ -505,8 +505,8 @@ class HasOffset {
     public:
         constexpr auto getOffset() const noexcept { return _offset; }
         void setOffset(uint64_t v) noexcept { _offset = v; }
-        void encode(MessageStream& msg) const;
-        void decode(MessageStream& msg);
+        void encode(MessageStream& msg) const { msg << _offset; }
+        void decode(MessageStream& msg) { msg >> _offset; }
     private:
         uint64_t _offset;
 };
