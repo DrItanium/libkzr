@@ -50,16 +50,18 @@ clean:
 
 
 Connection.o: Connection.cc Connection.h Message.h Operations.h \
- Exception.h
+ Exception.h MessageStream.h
 Exception.o: Exception.cc Exception.h
 FileHandleConnection.o: FileHandleConnection.cc FileHandleConnection.h \
- Connection.h Message.h Operations.h Exception.h
+ Connection.h Message.h Operations.h Exception.h MessageStream.h
 Interaction.o: Interaction.cc Interaction.h Message.h Operations.h \
- Exception.h
-Message.o: Message.cc Message.h Operations.h Exception.h
-Operations.o: Operations.cc Operations.h Message.h Exception.h
+ Exception.h MessageStream.h
+Message.o: Message.cc Message.h Operations.h Exception.h MessageStream.h
+Operations.o: Operations.cc Operations.h Message.h Exception.h \
+ MessageStream.h
 SocketConnection.o: SocketConnection.cc SocketConnection.h \
- FileHandleConnection.h Connection.h Message.h Operations.h Exception.h
+ FileHandleConnection.h Connection.h Message.h Operations.h Exception.h \
+ MessageStream.h
 UnixDomainSocketConnection.o: UnixDomainSocketConnection.cc Exception.h \
  UnixDomainSocketConnection.h SocketConnection.h FileHandleConnection.h \
- Connection.h Message.h Operations.h
+ Connection.h Message.h Operations.h MessageStream.h

@@ -27,6 +27,7 @@
  */
 
 #include "Message.h"
+#include "MessageStream.h"
 #include "Exception.h"
 
 namespace kzr {
