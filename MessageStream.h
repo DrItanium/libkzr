@@ -93,22 +93,22 @@ class MessageStream {
             decode(value);
             return value;
         }
-#define X(type) \
-        MessageStream& operator<<(type data); \
-        MessageStream& operator>>(type& data)
-        X(uint8_t);
-        X(uint16_t);
-        X(uint32_t);
-        X(uint64_t);
-#undef X
-        MessageStream& operator<<(const std::string& value);
-        MessageStream& operator>>(std::string& value);
         auto length() const noexcept { return _storage.str().length(); }
     private:
         std::stringstream _storage;
 };
 } // end namespace kzr
 
+kzr::MessageStream& operator<<(kzr::MessageStream&, const std::string&);
+kzr::MessageStream& operator>>(kzr::MessageStream&, std::string&);
+kzr::MessageStream& operator<<(kzr::MessageStream&, uint8_t);
+kzr::MessageStream& operator>>(kzr::MessageStream&, uint8_t&);
+kzr::MessageStream& operator<<(kzr::MessageStream&, uint16_t);
+kzr::MessageStream& operator>>(kzr::MessageStream&, uint16_t&);
+kzr::MessageStream& operator<<(kzr::MessageStream&, uint32_t);
+kzr::MessageStream& operator>>(kzr::MessageStream&, uint32_t&);
+kzr::MessageStream& operator<<(kzr::MessageStream&, uint64_t);
+kzr::MessageStream& operator>>(kzr::MessageStream&, uint64_t&);
 template<typename T>
 kzr::MessageStream& operator<<(kzr::MessageStream& msg, const T& value) {
     msg.encode<T>(value);

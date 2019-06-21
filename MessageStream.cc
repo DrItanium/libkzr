@@ -102,32 +102,6 @@ MessageStream::str() const {
 }
 void MessageStream::str(const std::string& input) { _storage.str(input); }
 void MessageStream::reset() { _storage.str(""); }
-MessageStream& 
-MessageStream::operator<<(const std::string& value) {
-    encode(value);
-    return *this;
-}
-MessageStream& 
-MessageStream::operator>>(std::string& value) {
-    decode(value);
-    return *this;
-}
-#define X(type) \
-        MessageStream& \
-        MessageStream::operator<<(type data) { \
-            encode(data); \
-            return *this;  \
-        } \
-        MessageStream& \
-        MessageStream::operator>>(type & data ) { \
-            decode(data); \
-            return *this; \
-        }
-        X(uint8_t);
-        X(uint16_t);
-        X(uint32_t);
-        X(uint64_t);
-#undef X
 
 void 
 MessageStream::write(const std::stringstream::char_type* s, std::streamsize count) {
@@ -164,3 +138,30 @@ MessageStream::peek() noexcept {
     }
 }
 } // end namespace kzr
+
+kzr::MessageStream& 
+operator<<(kzr::MessageStream& msg, const std::string& value) {
+    msg.encode(value);
+    return msg;
+}
+kzr::MessageStream& 
+operator>>(kzr::MessageStream& msg, std::string& value) {
+    msg.decode(value);
+    return msg;
+}
+#define X(type) \
+    kzr::MessageStream& \
+        operator<<(kzr::MessageStream& msg, type data) { \
+            msg.encode(data); \
+            return msg;  \
+        } \
+        kzr::MessageStream& \
+        operator>>(kzr::MessageStream& msg, type & data ) { \
+            msg.decode(data); \
+            return msg; \
+        }
+        X(uint8_t);
+        X(uint16_t);
+        X(uint32_t);
+        X(uint64_t);
+#undef X
