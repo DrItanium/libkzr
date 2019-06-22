@@ -188,33 +188,38 @@ class RequestMessage : public Message<getTMessageForm(op)> {
         ~RequestMessage() override = default;
 };
 
-class UndefinedResponse final : public Message<Operation::RBad> {
+enum class MessageDirection {
+    Request,
+    Response,
+};
+template<MessageDirection dir>
+class GenericUndefinedMessage final : public Message< dir == MessageDirection::Request ?  Operation::TBad : Operation::RBad> { 
+    private:
+        static constexpr bool isRequest() noexcept {
+            return dir == MessageDirection::Request;
+        }
     public:
-        using Parent = Message<Operation::RBad>;
+        using Parent = Message< dir == MessageDirection::Request ?  Operation::TBad : Operation::RBad>;
     public:
         using Parent::Parent;
-        ~UndefinedResponse() override = default;
+        ~GenericUndefinedMessage() override = default;
         void encode(MessageStream&) const override {
-            throw Exception("Undefined response!");
+            if constexpr (isRequest()) {
+                throw Exception("Undefined request!");
+            } else {
+                throw Exception("Undefined response!");
+            }
         }
         void decode(MessageStream&) override {
-            throw Exception("Undefined response!");
+            if constexpr (isRequest()) {
+                throw Exception("Undefined request!");
+            } else {
+                throw Exception("Undefined response!");
+            }
         }
 };
-
-class UndefinedRequest final : public Message<Operation::TBad> {
-    public:
-        using Parent = Message<Operation::TBad>;
-    public:
-        using Parent::Parent;
-        ~UndefinedRequest() override = default;
-        void encode(MessageStream&) const override {
-            throw Exception("Undefined request!");
-        }
-        void decode(MessageStream&) override {
-            throw Exception("Undefined request!");
-        }
-};
+using UndefinedResponse = GenericUndefinedMessage<MessageDirection::Response>;
+using UndefinedRequest = GenericUndefinedMessage<MessageDirection::Request>;
 class ErrorResponse : public ResponseMessage<ConceptualOperation::Error> {
     public:
         using Parent = ResponseMessage<ConceptualOperation::Error>;
@@ -254,10 +259,6 @@ class VersionBody {
         std::string _version;
         uint16_t _msize;
 
-};
-enum class MessageDirection {
-    Request,
-    Response,
 };
 template<MessageDirection dir>
 class GenericVersion :
