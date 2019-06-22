@@ -255,27 +255,36 @@ class VersionBody {
         uint16_t _msize;
 
 };
-class VersionRequest : public RequestMessage<ConceptualOperation::Version>, public VersionBody {
-    public:
-        using Parent = RequestMessage<ConceptualOperation::Version>;
-    public:
-        VersionRequest();
-        ~VersionRequest() override = default;
-        void encode(MessageStream&) const override;
-        void decode(MessageStream&) override;
-        void setTag(uint16_t) noexcept override { }
+enum class MessageDirection {
+    Request,
+    Response,
 };
+template<MessageDirection dir>
+class GenericVersion :
+    public std::conditional_t<dir == MessageDirection::Request,
+    RequestMessage<ConceptualOperation::Version>,
+    ResponseMessage<ConceptualOperation::Version>>, public VersionBody {
 
-class VersionResponse : public ResponseMessage<ConceptualOperation::Version>, public VersionBody {
     public:
-        using Parent = ResponseMessage<ConceptualOperation::Version>;
+        using Parent = std::conditional_t<dir == MessageDirection::Request,
+              RequestMessage<ConceptualOperation::Version>,
+              ResponseMessage<ConceptualOperation::Version>>;
     public:
-        VersionResponse();
-        ~VersionResponse() override = default;
-        void encode(MessageStream&) const override;
-        void decode(MessageStream&) override;
+        GenericVersion() : Parent(notag) { }
+        ~GenericVersion() override = default;
+        void encode(MessageStream& msg) const override {
+            Parent::encode(msg);
+            VersionBody::encode(msg);
+        }
+        void decode(MessageStream& msg) override {
+            Parent::decode(msg);
+            VersionBody::decode(msg);
+
+        }
         void setTag(uint16_t) noexcept override { }
-};
+    };
+using VersionRequest = GenericVersion<MessageDirection::Request>;
+using VersionResponse = GenericVersion<MessageDirection::Response>;
 /**
  * Negotiate authentication information with the server.
  */
@@ -520,7 +529,7 @@ class HasDataStorage {
     private:
         std::vector<uint8_t> _data;
 };
-template<ConceptualOperation op>
+template<ConceptualOperation op, typename ... Ts>
 class ReadWriteRequest : public FidRequest<op>, public HasOffset {
     public:
         using Parent = FidRequest<op>;

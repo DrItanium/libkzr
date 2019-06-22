@@ -44,29 +44,6 @@ MessageHeader::decode(MessageStream& msg) {
     msg >> _op >> _tag;
 }
 
-VersionRequest::VersionRequest() : Parent(notag) { }
-VersionResponse::VersionResponse() : Parent(notag) { }
-void
-VersionRequest::encode(MessageStream& msg) const {
-    Parent::encode(msg);
-    VersionBody::encode(msg);
-}
-void
-VersionRequest::decode(MessageStream& msg) {
-    Parent::decode(msg);
-    VersionBody::decode(msg);
-}
-
-void
-VersionResponse::encode(MessageStream& msg) const {
-    Parent::encode(msg);
-    VersionBody::encode(msg);
-}
-void
-VersionResponse::decode(MessageStream& msg) {
-    Parent::decode(msg);
-    VersionBody::decode(msg);
-}
 void
 VersionBody::encode(MessageStream& msg) const {
     msg << _msize << _version;
