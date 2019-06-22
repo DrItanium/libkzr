@@ -44,17 +44,6 @@ MessageHeader::decode(MessageStream& msg) {
     msg >> _op >> _tag;
 }
 
-void
-VersionBody::encode(MessageStream& msg) const {
-    msg << _msize << _version;
-}
-
-void
-VersionBody::decode(MessageStream& msg) {
-    msg >> _msize >> _version;
-}
-
-
 void 
 ErrorResponse::encode(MessageStream& msg) const {
     Parent::encode(msg);

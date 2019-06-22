@@ -162,44 +162,40 @@ class MessageHeader {
         Operation _op;
         uint16_t _tag;
 };
-template<Operation op>
-class Message : public MessageHeader {
-    public:
-        using Parent = MessageHeader;
-    public:
-        Message() : Parent(op) { }
-        explicit Message(uint16_t tag) : Parent(op, tag) { }
-        ~Message() override = default;
-};
-template<ConceptualOperation op>
-class ResponseMessage : public Message<getRMessageForm(op)> {
-    public:
-        using Parent = Message<getRMessageForm(op)>;
-    public:
-        using Parent::Parent;
-        ~ResponseMessage() override = default;
-};
-template<ConceptualOperation op>
-class RequestMessage : public Message<getTMessageForm(op)> {
-    public:
-        using Parent = Message<getTMessageForm(op)>;
-    public:
-        using Parent::Parent;
-        ~RequestMessage() override = default;
-};
-
 enum class MessageDirection {
     Request,
     Response,
 };
+constexpr Operation translateConcept(ConceptualOperation op, MessageDirection dir) noexcept {
+    if (op == ConceptualOperation::Undefined) {
+        return dir == MessageDirection::Request ? Operation::TBad : Operation::RBad;
+    } else {
+        return (dir == MessageDirection::Request) ? getTMessageForm(op) : getRMessageForm(op);
+    }
+
+}
+template<ConceptualOperation op, MessageDirection dir>
+class Message : public MessageHeader {
+    public:
+        using Parent = MessageHeader;
+        static constexpr Operation RawOperation = translateConcept(op, dir);
+    public:
+        explicit Message(uint16_t tag = notag) : Parent(RawOperation, tag) { }
+        ~Message() override = default;
+};
+template<ConceptualOperation op>
+using ResponseMessage = Message<op, MessageDirection::Response>;
+template<ConceptualOperation op>
+using RequestMessage = Message<op, MessageDirection::Request>;
+
 template<MessageDirection dir>
-class GenericUndefinedMessage final : public Message< dir == MessageDirection::Request ?  Operation::TBad : Operation::RBad> { 
+class GenericUndefinedMessage final : public Message< ConceptualOperation::Undefined, dir> {
     private:
         static constexpr bool isRequest() noexcept {
             return dir == MessageDirection::Request;
         }
     public:
-        using Parent = Message< dir == MessageDirection::Request ?  Operation::TBad : Operation::RBad>;
+        using Parent = Message<ConceptualOperation::Undefined, dir>;
     public:
         using Parent::Parent;
         ~GenericUndefinedMessage() override = default;
@@ -241,10 +237,22 @@ class ErrorResponse : public ResponseMessage<ConceptualOperation::Error> {
 };
 // Requesting errors does not make sense but this is here for regularity
 using ErrorRequest = RequestMessage<ConceptualOperation::Error>;
-class VersionBody {
+template<MessageDirection dir>
+class VersionMessage : public Message<ConceptualOperation::Version, dir> {
     public:
-        void encode(MessageStream&) const;
-        void decode(MessageStream&);
+        using Parent = Message<ConceptualOperation::Version, dir>;
+    public:
+        VersionMessage() : Parent(notag) { }
+        ~VersionMessage() override = default;
+        void encode(MessageStream& msg) const override {
+            Parent::encode(msg);
+            msg << _msize << _version;
+        }
+        void decode(MessageStream& msg) override {
+            Parent::decode(msg);
+            msg >> _msize >> _version;
+        }
+        void setTag(uint16_t) noexcept override { }
         /**
          * Get the string representation of the 9p protocol version
          */
@@ -258,34 +266,9 @@ class VersionBody {
     private:
         std::string _version;
         uint16_t _msize;
-
-};
-template<MessageDirection dir>
-class GenericVersion :
-    public std::conditional_t<dir == MessageDirection::Request,
-    RequestMessage<ConceptualOperation::Version>,
-    ResponseMessage<ConceptualOperation::Version>>, public VersionBody {
-
-    public:
-        using Parent = std::conditional_t<dir == MessageDirection::Request,
-              RequestMessage<ConceptualOperation::Version>,
-              ResponseMessage<ConceptualOperation::Version>>;
-    public:
-        GenericVersion() : Parent(notag) { }
-        ~GenericVersion() override = default;
-        void encode(MessageStream& msg) const override {
-            Parent::encode(msg);
-            VersionBody::encode(msg);
-        }
-        void decode(MessageStream& msg) override {
-            Parent::decode(msg);
-            VersionBody::decode(msg);
-
-        }
-        void setTag(uint16_t) noexcept override { }
     };
-using VersionRequest = GenericVersion<MessageDirection::Request>;
-using VersionResponse = GenericVersion<MessageDirection::Response>;
+using VersionRequest = VersionMessage<MessageDirection::Request>;
+using VersionResponse = VersionMessage<MessageDirection::Response>;
 /**
  * Negotiate authentication information with the server.
  */
