@@ -188,8 +188,32 @@ using ResponseMessage = Message<op, MessageDirection::Response>;
 template<ConceptualOperation op>
 using RequestMessage = Message<op, MessageDirection::Request>;
 
+#if 0
+template<ConceptualOperation op, MessageDirection dir, typename ... Ts> 
+class OrderedMessage : public Message<op, dir>, public Ts... {
+    public:
+        using Parent = Message<op, dir>;
+    public:
+        using Parent::Parent;
+        ~OrderedMessage() override = default;
+        void encode(MessageStream& msg) const override {
+            Parent::encode(msg);
+            (Ts::encode(msg), ...);
+        }
+        void decode(MessageStream& msg) override {
+            Parent::decode(msg);
+            (Ts::decode(msg), ...);
+        }
+};
+
+template<ConceptualOperation op, typename ... Ts>
+using OrderedResponseMessage = OrderedMessage<op, MessageDirection::Response, Ts...>;
+template<ConceptualOperation op, typename ... Ts>
+using OrderedRequestMessage = OrderedMessage<op, MessageDirection::Request, Ts...>;
+#endif
+
 template<MessageDirection dir>
-class GenericUndefinedMessage final : public Message< ConceptualOperation::Undefined, dir> {
+class UndefinedMessage final : public Message< ConceptualOperation::Undefined, dir> {
     private:
         static constexpr bool isRequest() noexcept {
             return dir == MessageDirection::Request;
@@ -198,7 +222,7 @@ class GenericUndefinedMessage final : public Message< ConceptualOperation::Undef
         using Parent = Message<ConceptualOperation::Undefined, dir>;
     public:
         using Parent::Parent;
-        ~GenericUndefinedMessage() override = default;
+        ~UndefinedMessage() override = default;
         void encode(MessageStream&) const override {
             if constexpr (isRequest()) {
                 throw Exception("Undefined request!");
@@ -214,8 +238,8 @@ class GenericUndefinedMessage final : public Message< ConceptualOperation::Undef
             }
         }
 };
-using UndefinedResponse = GenericUndefinedMessage<MessageDirection::Response>;
-using UndefinedRequest = GenericUndefinedMessage<MessageDirection::Request>;
+using UndefinedResponse = UndefinedMessage<MessageDirection::Response>;
+using UndefinedRequest = UndefinedMessage<MessageDirection::Request>;
 class ErrorResponse : public ResponseMessage<ConceptualOperation::Error> {
     public:
         using Parent = ResponseMessage<ConceptualOperation::Error>;
@@ -513,7 +537,7 @@ class HasDataStorage {
     private:
         std::vector<uint8_t> _data;
 };
-template<ConceptualOperation op, typename ... Ts>
+template<ConceptualOperation op>
 class ReadWriteRequest : public FidRequest<op>, public HasOffset {
     public:
         using Parent = FidRequest<op>;
