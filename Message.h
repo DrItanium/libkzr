@@ -174,6 +174,7 @@ constexpr Operation translateConcept(ConceptualOperation op, MessageDirection di
     }
 
 }
+
 template<ConceptualOperation op, MessageDirection dir>
 class Message : public MessageHeader {
     public:
@@ -188,29 +189,6 @@ using ResponseMessage = Message<op, MessageDirection::Response>;
 template<ConceptualOperation op>
 using RequestMessage = Message<op, MessageDirection::Request>;
 
-#if 0
-template<ConceptualOperation op, MessageDirection dir, typename ... Ts> 
-class OrderedMessage : public Message<op, dir>, public Ts... {
-    public:
-        using Parent = Message<op, dir>;
-    public:
-        using Parent::Parent;
-        ~OrderedMessage() override = default;
-        void encode(MessageStream& msg) const override {
-            Parent::encode(msg);
-            (Ts::encode(msg), ...);
-        }
-        void decode(MessageStream& msg) override {
-            Parent::decode(msg);
-            (Ts::decode(msg), ...);
-        }
-};
-
-template<ConceptualOperation op, typename ... Ts>
-using OrderedResponseMessage = OrderedMessage<op, MessageDirection::Response, Ts...>;
-template<ConceptualOperation op, typename ... Ts>
-using OrderedRequestMessage = OrderedMessage<op, MessageDirection::Request, Ts...>;
-#endif
 
 template<MessageDirection dir>
 class UndefinedMessage final : public Message< ConceptualOperation::Undefined, dir> {
