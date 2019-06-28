@@ -169,46 +169,34 @@ KZR_PROTOCOL_KINDS
             }
         }
     }
+    struct NonMovable {
+        NonMovable() = default;
+        NonMovable& operator=(NonMovable&&) = delete;
+        NonMovable(NonMovable&&) = delete;
+    };
+    struct NonCopyable {
+        NonCopyable() = default;
+        NonCopyable& operator=(const NonCopyable&) = delete;
+        NonCopyable(const NonCopyable&) = delete;
+    };
+    struct NonConstructible : private NonMovable, private NonCopyable {
+        NonConstructible() = delete;
+        ~NonConstructible() = delete;
+    };
     class MessageStream;
     template<ConceptualOperation op>
-    struct RequestToTypeBinding final {
-        RequestToTypeBinding() = delete;
-        ~RequestToTypeBinding() = delete;
-        RequestToTypeBinding(const RequestToTypeBinding&) = delete;
-        RequestToTypeBinding(RequestToTypeBinding&&) = delete;
-        RequestToTypeBinding& operator=(RequestToTypeBinding&&) = delete;
-        RequestToTypeBinding& operator=(const RequestToTypeBinding&) = delete;
-    };
+    struct RequestToTypeBinding final : private NonConstructible { };
 #define BindRequestToType(kind, type) \
     template<> \
-    struct RequestToTypeBinding<ConceptualOperation:: kind > final { \
-        RequestToTypeBinding() = delete; \
-        ~RequestToTypeBinding() = delete; \
-        RequestToTypeBinding(const RequestToTypeBinding&) = delete; \
-        RequestToTypeBinding(RequestToTypeBinding&&) = delete; \
-        RequestToTypeBinding& operator=(RequestToTypeBinding&&) = delete; \
-        RequestToTypeBinding& operator=(const RequestToTypeBinding&) = delete; \
+    struct RequestToTypeBinding<ConceptualOperation:: kind > final : private NonConstructible { \
         using BoundType = type ; \
     }
 
     template<ConceptualOperation op>
-    struct ResponseToTypeBinding final {
-        ResponseToTypeBinding() = delete;
-        ~ResponseToTypeBinding() = delete;
-        ResponseToTypeBinding(const ResponseToTypeBinding&) = delete;
-        ResponseToTypeBinding(ResponseToTypeBinding&&) = delete;
-        ResponseToTypeBinding& operator=(ResponseToTypeBinding&&) = delete;
-        ResponseToTypeBinding& operator=(const ResponseToTypeBinding&) = delete;
-    };
+    struct ResponseToTypeBinding final : private NonConstructible { };
 #define BindResponseToType(kind, type) \
     template<> \
-    struct ResponseToTypeBinding<ConceptualOperation:: kind > final { \
-        ResponseToTypeBinding() = delete; \
-        ~ResponseToTypeBinding() = delete; \
-        ResponseToTypeBinding(const ResponseToTypeBinding&) = delete; \
-        ResponseToTypeBinding(ResponseToTypeBinding&&) = delete; \
-        ResponseToTypeBinding& operator=(ResponseToTypeBinding&&) = delete; \
-        ResponseToTypeBinding& operator=(const ResponseToTypeBinding&) = delete; \
+    struct ResponseToTypeBinding<ConceptualOperation:: kind > final : private NonConstructible { \
         using BoundType = type ; \
     }
 
