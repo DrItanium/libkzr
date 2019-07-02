@@ -36,6 +36,9 @@
 #include <sstream>
 #include <tuple>
 #include <variant>
+#ifdef __cpp_lib_concepts
+#include <concepts>
+#endif 
 #include "Operations.h"
 #include "Exception.h"
 
@@ -55,6 +58,17 @@ constexpr uint32_t build(uint8_t lowest, uint8_t lower, uint8_t high, uint8_t hi
 constexpr uint64_t build(uint32_t lower, uint32_t upper) noexcept {
     return (uint64_t(upper) << 32) | uint64_t(lower);
 }
+#ifdef __cpp_lib_concepts
+template<typename T>
+concept Encodable = requires(MessageStream& os, const T& a) {
+    { a.encode(os); } -> void;
+};
+
+template<typename T>
+concept Decodeable = requires(MessageStream& is, T& a) {
+    { a.encode(is); } -> void;
+};
+#endif // end __cpp_lib_concepts 
 
 /**
  * A memory stream used to encode and decode messages
@@ -79,6 +93,14 @@ class MessageStream {
         void decode(uint64_t& value);
         void decode(std::string& value);
         std::optional<uint8_t> peek() noexcept;
+#ifdef __cpp_lib_concepts
+        void encode(const Encodable& data) {
+            data.encode(*this);
+        }
+        void decode(Encodable& data) {
+            data.decode(*this);
+        }
+#else 
         template<typename T>
         void encode(const T& data) {
             data.encode(*this);
@@ -87,6 +109,7 @@ class MessageStream {
         void decode(T& data) {
             data.decode(*this);
         }
+#endif
         template<typename T>
         T decode() {
             T value;
@@ -109,6 +132,8 @@ kzr::MessageStream& operator<<(kzr::MessageStream&, uint32_t);
 kzr::MessageStream& operator>>(kzr::MessageStream&, uint32_t&);
 kzr::MessageStream& operator<<(kzr::MessageStream&, uint64_t);
 kzr::MessageStream& operator>>(kzr::MessageStream&, uint64_t&);
+
+
 template<typename T>
 kzr::MessageStream& operator<<(kzr::MessageStream& msg, const T& value) {
     msg.encode<T>(value);
