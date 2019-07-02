@@ -58,7 +58,7 @@ constexpr uint32_t build(uint8_t lowest, uint8_t lower, uint8_t high, uint8_t hi
 constexpr uint64_t build(uint32_t lower, uint32_t upper) noexcept {
     return (uint64_t(upper) << 32) | uint64_t(lower);
 }
-#ifdef __cpp_lib_concepts
+#ifdef __cpp_concepts 
 template<typename T>
 concept Encodable = requires(MessageStream& os, const T& a) {
     { a.encode(os); } -> void;
@@ -68,7 +68,7 @@ template<typename T>
 concept Decodeable = requires(MessageStream& is, T& a) {
     { a.encode(is); } -> void;
 };
-#endif // end __cpp_lib_concepts 
+#endif // end __cpp_concepts 
 
 /**
  * A memory stream used to encode and decode messages
@@ -93,7 +93,7 @@ class MessageStream {
         void decode(uint64_t& value);
         void decode(std::string& value);
         std::optional<uint8_t> peek() noexcept;
-#ifdef __cpp_lib_concepts
+#ifdef __cpp_concepts 
         void encode(const Encodable& data) {
             data.encode(*this);
         }
@@ -112,6 +112,7 @@ class MessageStream {
 #endif
         template<typename T>
         T decode() {
+            // will need to make sure the given type is constructible
             T value;
             decode(value);
             return value;
