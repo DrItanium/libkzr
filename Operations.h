@@ -104,7 +104,7 @@ KZR_PROTOCOL_KINDS
     }
     template<typename T>
     constexpr auto isOdd(T value) noexcept {
-        return !isEven(value);
+        return (value & 1) != 0;
     }
     constexpr auto isRequest(Operation op) noexcept {
         return isEven<uint8_t>(static_cast<uint8_t>(op));
