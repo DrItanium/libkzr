@@ -49,6 +49,9 @@ class Server {
         virtual Response process(const AttachRequest&) noexcept;
         virtual Response process(const CreateRequest&) noexcept;
         virtual Response process(const RemoveRequest&) noexcept;
+        void invoke() noexcept;
+        void stopExecution() noexcept { _isRunning = false; }
+        constexpr auto isRunning() const noexcept { return _isRunning; }
     private:
         Request recieve();
         void reply(const Response&);
@@ -56,6 +59,7 @@ class Server {
         Response process(const UndefinedRequest&) noexcept;
     private:
         Connection& _conn;
+        bool _isRunning = false;
 };
 } // end namespace kzr
 #endif // end KZR_SERVER_H__

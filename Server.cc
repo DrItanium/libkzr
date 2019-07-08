@@ -101,4 +101,12 @@ namespace kzr {
     Server::reply(const Response& resp) {
         _conn << resp;
     }
+
+    void 
+    Server::invoke() noexcept {
+        _isRunning = true;
+        while(isRunning()) {
+            reply(process(recieve()));
+        }
+    }
 } // end namespace kzr
