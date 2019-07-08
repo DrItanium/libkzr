@@ -13,7 +13,8 @@ LIBKZR_CORE_OBJS := Message.o \
 	SocketConnection.o \
 	UnixDomainSocketConnection.o \
 	Interaction.o \
-	MessageStream.o
+	MessageStream.o \
+	Server.o
 
 LIBKZR_ARCHIVE := libkzr.a
 
@@ -48,8 +49,6 @@ clean:
 
 # generated via g++ -MM -std=c++17 *.cc
 
-
-
 Connection.o: Connection.cc Connection.h Message.h Operations.h \
  Exception.h MessageStream.h
 Exception.o: Exception.cc Exception.h
@@ -60,8 +59,9 @@ Interaction.o: Interaction.cc Interaction.h Message.h Operations.h \
 Message.o: Message.cc Message.h Operations.h Exception.h MessageStream.h
 MessageStream.o: MessageStream.cc MessageStream.h Operations.h \
  Exception.h
-Operations.o: Operations.cc Operations.h Exception.h \
- MessageStream.h
+Operations.o: Operations.cc Operations.h MessageStream.h Exception.h
+Server.o: Server.cc Server.h Operations.h Interaction.h Message.h \
+ Exception.h MessageStream.h Connection.h
 SocketConnection.o: SocketConnection.cc SocketConnection.h \
  FileHandleConnection.h Connection.h Message.h Operations.h Exception.h \
  MessageStream.h
