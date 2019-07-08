@@ -30,7 +30,9 @@
 #include <variant>
 #include <functional>
 #include "Message.h"
+#include "Connection.h"
 namespace kzr {
+class Connection;
 using Response = std::variant<
 UndefinedResponse
 #define X(name, _) ,BoundResponseType<ConceptualOperation:: name >
@@ -58,4 +60,17 @@ kzr::MessageStream& operator<<(kzr::MessageStream&, const kzr::Response&);
 kzr::MessageStream& operator>>(kzr::MessageStream&, kzr::Response&);
 kzr::MessageStream& operator<<(kzr::MessageStream&, const kzr::Interaction&);
 kzr::MessageStream& operator>>(kzr::MessageStream&, kzr::Interaction&);
+template<typename T>
+kzr::Connection& operator<<(kzr::Connection& conn, const T& req) {
+    kzr::MessageStream ms;
+    conn << (ms << req);
+    return conn;
+}
+template<typename T>
+kzr::Connection& operator>>(kzr::Connection& conn, T& req) {
+    kzr::MessageStream ms;
+    conn >> ms;
+    ms >> req;
+    return conn;
+}
 #endif // end KZR_CLIENT_H__

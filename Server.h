@@ -50,6 +50,8 @@ class Server {
         virtual Response process(const CreateRequest&) noexcept;
         virtual Response process(const RemoveRequest&) noexcept;
     private:
+        Request recieve();
+        void reply(const Response&);
         Response process(const ErrorRequest&) noexcept; 
         Response process(const UndefinedRequest&) noexcept;
     private:

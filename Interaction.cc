@@ -26,6 +26,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "Interaction.h"
+#include "Connection.h"
 kzr::MessageStream& 
 operator<<(kzr::MessageStream& msg, const kzr::Request& request) {
     std::visit([&msg](auto&& value) { msg << value; }, request);
@@ -99,3 +100,4 @@ operator>>(kzr::MessageStream& msg, kzr::Interaction& thing) {
         throw kzr::Exception("Cannot deduce type because message is not in a good state!");
     }
 }
+

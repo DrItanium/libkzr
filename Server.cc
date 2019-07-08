@@ -31,51 +31,74 @@
 
 namespace kzr {
     Server::Server(Connection& conn) : _conn(conn) { }
-    Response Server::process(const Request& input) noexcept {
+    Response 
+    Server::process(const Request& input) noexcept {
         return std::visit([this](auto&& value) noexcept { return process(value); }, input);
     }
-    Response Server::process(const OpenRequest& req) noexcept {
+    Response 
+    Server::process(const OpenRequest& req) noexcept {
         return ErrorResponse::make(req.getTag(), "open unimplemented");
     }
-    Response Server::process(const WalkRequest& req) noexcept {
+    Response 
+    Server::process(const WalkRequest& req) noexcept {
         return ErrorResponse::make(req.getTag(), "walk unimplemented");
     }
-    Response Server::process(const VersionRequest& req) noexcept {
+    Response 
+    Server::process(const VersionRequest& req) noexcept {
         return ErrorResponse::make(req.getTag(), "version unimplemented");
     }
-    Response Server::process(const ReadRequest& req) noexcept {
+    Response 
+    Server::process(const ReadRequest& req) noexcept {
         return ErrorResponse::make(req.getTag(), "read unimplemented");
     }
-    Response Server::process(const StatRequest& req) noexcept {
+    Response 
+    Server::process(const StatRequest& req) noexcept {
         return ErrorResponse::make(req.getTag(), "stat unimplemented");
     }
-    Response Server::process(const WriteRequest& req) noexcept {
+    Response 
+    Server::process(const WriteRequest& req) noexcept {
         return ErrorResponse::make(req.getTag(), "write unimplemented");
     }
-    Response Server::process(const ClunkRequest& req) noexcept {
+    Response 
+    Server::process(const ClunkRequest& req) noexcept {
         return ErrorResponse::make(req.getTag(), "clunk unimplemented");
     }
-    Response Server::process(const FlushRequest& req) noexcept {
+    Response 
+    Server::process(const FlushRequest& req) noexcept {
         return ErrorResponse::make(req.getTag(), "flush unimplemented");
     }
-    Response Server::process(const AuthenticationRequest& req) noexcept {
+    Response 
+    Server::process(const AuthenticationRequest& req) noexcept {
         return ErrorResponse::make(req.getTag(), "auth unimplemented");
     }
-    Response Server::process(const AttachRequest& req) noexcept {
+    Response 
+    Server::process(const AttachRequest& req) noexcept {
         return ErrorResponse::make(req.getTag(), "attach unimplemented");
     }
-    Response Server::process(const CreateRequest& req) noexcept {
+    Response 
+    Server::process(const CreateRequest& req) noexcept {
         return ErrorResponse::make(req.getTag(), "create unimplemented");
     }
-    Response Server::process(const RemoveRequest& req) noexcept {
+    Response 
+    Server::process(const RemoveRequest& req) noexcept {
         return ErrorResponse::make(req.getTag(), "remove unimplemented");
     }
-    Response Server::process(const ErrorRequest& req) noexcept {
+    Response 
+    Server::process(const ErrorRequest& req) noexcept {
         return ErrorResponse::make(req.getTag(), "illegal request of an error!");
     }
-    Response Server::process(const UndefinedRequest& req) noexcept {
+    Response 
+    Server::process(const UndefinedRequest& req) noexcept {
         return ErrorResponse::make(req.getTag(), "Undefined request type!");
     }
-
-
+    Request 
+    Server::recieve() {
+        Request r;
+        _conn >> r;
+        return r;
+    }
+    void 
+    Server::reply(const Response& resp) {
+        _conn << resp;
+    }
 } // end namespace kzr
