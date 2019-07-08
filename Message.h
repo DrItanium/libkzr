@@ -221,6 +221,11 @@ using UndefinedRequest = UndefinedMessage<MessageDirection::Request>;
 class ErrorResponse : public ResponseMessage<ConceptualOperation::Error> {
     public:
         using Parent = ResponseMessage<ConceptualOperation::Error>;
+        static ErrorResponse make(uint16_t tag, const std::string& msg) noexcept {
+            ErrorResponse r(tag);
+            r.setErrorName(msg);
+            return r;
+        }
     public:
         using Parent::Parent;
         virtual ~ErrorResponse() = default;
