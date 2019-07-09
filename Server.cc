@@ -45,7 +45,17 @@ namespace kzr {
     }
     Response 
     Server::process(const VersionRequest& req) noexcept {
-        return ErrorResponse::make(req.getTag(), "version unimplemented");
+        // TODO use the msize field and do sanity checks on it
+        // the MessageStream will have to be aware of the maximum size and error
+        // out if the size is exceeded
+        VersionResponse resp;
+        resp.setMsize(req.getMsize());
+        if (req.getVersion() != "9P2000") {
+            resp.setVersion("unknown");
+        } else {
+            resp.setVersion("9P2000");
+        }
+        return resp;
     }
     Response 
     Server::process(const ReadRequest& req) noexcept {
@@ -102,11 +112,4 @@ namespace kzr {
         _conn << resp;
     }
 
-    void 
-    Server::invoke() noexcept {
-        _isRunning = true;
-        while(isRunning()) {
-            reply(process(recieve()));
-        }
-    }
 } // end namespace kzr

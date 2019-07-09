@@ -40,9 +40,13 @@ class Connection {
         virtual ~Connection() = default;
         void write(const MessageStream&);
         void read(MessageStream&);
+        constexpr auto getMsize() const noexcept { return _msize; }
+        void setMsize(size_t size) noexcept { _msize = size; }
     protected:
         [[nodiscard]] virtual size_t rawWrite(const std::string& data) = 0;
         [[nodiscard]] virtual size_t rawRead(std::string& data) = 0;
+    private:
+        size_t _msize;
 };
 
 } // end namespace kzr
